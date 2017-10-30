@@ -1,7 +1,7 @@
 {% block body %}
     <div class="title">NFQ Akademija</div>
     {% if app.user %}
-        <div><a href="{{ path('login.facebook') }}">Atsijungti</a></div>
+        <div><a href="{{ path('logout') }}">Atsijungti</a></div>
     {% else %}
         <div><a href="{{ path('login.facebook') }}">Prisijungti</a></div>
     {% endif %}

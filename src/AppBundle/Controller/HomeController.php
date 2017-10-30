@@ -5,7 +5,7 @@ namespace AppBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use AppBundle\Utils\OAuthClient;
+use AppBundle\Utils\Calendar;
 
 /*
  * Class HomeController
@@ -20,26 +20,16 @@ class HomeController extends Controller
      */
     public function indexAction(Request $request)
     {
-       // $em = $this->getDoctrine()->getManager();
-       // $productRepo = $em->getRepository(Product::class);
-       // $product = $productRepo
-        $name = "not set";
-        if(isset($_SESSION['Name']))
-        {
-            $name = $_SESSION['Name'];
-        }
-        return $this->render('AppBundle:Home:index.html.twig', [
-            "info" => $name
-        ]);
+
+        return $this->render('AppBundle:Home:index.html.twig');
     }
 
     /**
-     * @Route("/login", name="login")
+     * @Route("/logout", name="logout")
      */
     public function loginAction()
     {
-        $auth =  new  OAuthClient();
-        $auth->connect();
 
     }
+
 }

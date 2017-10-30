@@ -18,6 +18,9 @@ security:
             security: false
         main:
             anonymous: ~
+            logout:
+                path: /logout
+                target: /
             guard:
                 authenticators:
                     - AppBundle\Security\User\Authenticator
