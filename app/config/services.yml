@@ -30,10 +30,9 @@ services:
         public: true
         tags: ['controller.service_arguments']
 
-   # AppBundle\Utils\Authenticator:
-   #     public: false
-    #AppBundle\Security\User:
-     #   public: false
     AppBundle\Utils\OAuthClient:
+        arguments:
+            $facebook_data: '%facebook_client%'
+
         public: true
         shared: true

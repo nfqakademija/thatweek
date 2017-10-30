@@ -22,7 +22,7 @@ class Authenticator extends AbstractGuardAuthenticator
     public function getCredentials(Request $request)
     {
         if ($request->getPathInfo() === '/login/facebook/check') {
-            $this->client->generateAccessToken();
+            $this->client->generateAccessToken($request);
         }
 
         return $this->client->getAccessToken();

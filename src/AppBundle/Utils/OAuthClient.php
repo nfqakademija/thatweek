@@ -2,48 +2,53 @@
 
 namespace AppBundle\Utils;
 
-use AppBundle\Security\User\WebserviceUserProvider;
+use Symfony\Component\HttpFoundation\Request;
 use League\OAuth2\Client\Token\AccessToken;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 class OAuthClient
 {
 
     private $provider;
     private $accessToken;
-    public $calls;
-    public function __construct()
+    private $fieldsToRetrieve = array('first_name', 'last_name', 'id');
+
+    public function __construct($facebook_data)
     {
         $this->provider = new \League\OAuth2\Client\Provider\GenericProvider([
-            'clientId' => '1902721706722915',
-            'clientSecret' => 'ecacaf772f3588c8579ef3e46d2b4184',
-            'redirectUri' => 'http://localhost:8000/login/facebook/check',
-            'urlAuthorize' => 'https://www.facebook.com/v2.10/dialog/oauth?',
-            'urlAccessToken' => 'https://graph.facebook.com/v2.10/oauth/access_token?',
-            'urlResourceOwnerDetails' => 'https://graph.facebook.com/me?fields=first_name,last_name,id']);
+            'clientId' => $facebook_data['client_id'],
+            'clientSecret' => $facebook_data['client_secret'],
+            'redirectUri' => $facebook_data['redirect_uri'],
+            'urlAuthorize' => $facebook_data['url_authorize'],
+            'urlAccessToken' => $facebook_data['url_access_token'],
+            'urlResourceOwnerDetails' => $this->formResourceUrl($facebook_data['url_resource'])]);
     }
 
-    public function connect()
+    public function connect(Request $request)
     {
         $authorizationUrl = $this->provider->getAuthorizationUrl();
-        $_SESSION['oauth2state'] = $this->provider->getState();
+        if($request->hasSession())
+            $session = $request->getSession();
+        else $session = new Session();
+
+        $session->set('oauth2state', $this->provider->getState());
         header('Location: ' . $authorizationUrl);
 
     }
 
-    public function generateAccessToken()
+    public function generateAccessToken(Request $request)
     {
-        if (empty($_GET['state']) || (isset($_SESSION['oauth2state']) && $_GET['state'] !== $_SESSION['oauth2state'])) {
+        $session = $request->getSession();
+        $state = $request->get('state');
+        if(empty($state) || $session->has('oauth2state') && $state !== $session->get('oauth2state'))
+        {
+            $session->remove('oauth2state');
 
-            if (isset($_SESSION['oauth2state'])) {
-                unset($_SESSION['oauth2state']);
-            }
-
-            exit('Invalid state');
-
+            throw new \Exception('Invalid state');
         }
         try {
             $this->accessToken = $this->provider->getAccessToken('authorization_code', [
-                'code' => $_GET['code']
+                'code' => $request->get('code')
             ]);
         } catch (\League\OAuth2\Client\Provider\Exception\IdentityProviderException $e) {
 
@@ -60,6 +65,11 @@ class OAuthClient
     public function getUser($accessToken)
     {
         return $this->provider->getResourceOwner($accessToken)->toArray();
+    }
+
+    private function formResourceUrl($url)
+    {
+        return $url . implode(',', $this->fieldsToRetrieve);
     }
 
 }

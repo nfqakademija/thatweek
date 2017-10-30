@@ -2,7 +2,6 @@
 
 namespace AppBundle\Controller;
 
-use AppBundle\AppBundle;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -20,10 +19,10 @@ class LoginController extends Controller
      * @Route("/facebook", name="login.facebook")
      * @param OAuthClient $auth
      */
-    public function facebookLoginAction()
+    public function facebookLoginAction(Request $request)
     {
         $client = $this->container->get('AppBundle\Utils\OAuthClient');
-        $client->connect();
+        $client->connect($request);
         return $this->render('AppBundle:Home:index.html.twig', [
         "info" => 'd'
     ]);
