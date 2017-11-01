@@ -1,5 +1,5 @@
 var months = [];
-var currentDisplayedMonth = 0;
+var currentDisplayedMonth = 4;
 
 var monthNames = ['Sausis', 'Vasaris', 'Kovas', 'Balandis', 'Gegužė', 'Birželis',
     'Liepa', 'Rugpjūtis', 'Rugsėjis', 'Spalis', 'Lapkritis', 'Gruodis'];
@@ -39,7 +39,7 @@ function renderMonth()
         weekDay++;
         tableRow += '<td>' + i + '</td>';
         if(weekDay % 7 == '0' || i == currentMonth.endDay) {
-            if(weekIndex == '0' && startsAtPreviousMonth(currentMonth.weeks[0]) && weekDay <= 7)
+            if(weekIndex == '0' && startsAtPreviousMonth(currentMonth.weeks[0]) && i <= 7)
                 $('#calendar').append(getFormatedTableRow(-1, tableRow));
             else {
                 $('#calendar').append(getFormatedTableRow(weekIndex, tableRow));

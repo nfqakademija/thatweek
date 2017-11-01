@@ -23,4 +23,15 @@
             <div id="unitsSoldLabel"></div>
         </div>
     </div>
+
+    <div>
+        {% for participant in participants %}
+            <div>{{ participant.firstName }}</div>
+        {% endfor %}
+    </div>
+    <div id="form" style="display: block">
+        {{ form_start(participantForm) }}
+
+        {{ form_end(participantForm) }}
+    </div>
 {% endblock %}
