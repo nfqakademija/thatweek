@@ -20,7 +20,7 @@ services:
     _defaults:
         autowire: true
         autoconfigure: true
-        public: false
+        public: true
     AppBundle\:
         resource: '../../src/AppBundle/*'
         exclude: '../../src/AppBundle/{Entity,Repository,Tests}'
@@ -30,9 +30,6 @@ services:
         public: true
         tags: ['controller.service_arguments']
 
-    AppBundle\Utils\OAuthClient:
+    AppBundle\Service\OAuthClient:
         arguments:
             $facebook_data: '%facebook_client%'
-
-        public: true
-        shared: true

@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\Utils;
+namespace AppBundle\Service;
 
 use Doctrine\ORM\EntityManager;
 use AppBundle\Entity\Week;
@@ -72,11 +72,11 @@ class Calendar
 
     private function getNewWeek($startDate)
     {
-        $week = new Week();
-        $week->setStartDate($startDate);
         $endOfWeekDate = strtotime('+6 days', $startDate);
-        $week->setEndDate($endOfWeekDate);
-        $week->setUnitsSold(0);
+        $week = new Week();
+        $week->setStartDate($startDate)
+            ->setEndDate($endOfWeekDate)
+            ->setUnitsSold(0);
         return $week;
     }
 

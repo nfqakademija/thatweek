@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\Utils;
+namespace AppBundle\Service;
 
 use Symfony\Component\HttpFoundation\Request;
 use League\OAuth2\Client\Token\AccessToken;

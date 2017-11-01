@@ -8,7 +8,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Doctrine\ORM\EntityManager;
-use AppBundle\Utils\OAuthClient;
+use AppBundle\Service\OAuthClient;
 
 class WebserviceUserProvider implements UserProviderInterface
 {
