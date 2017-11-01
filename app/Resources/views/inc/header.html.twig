@@ -1,7 +1,9 @@
 {% block body %}
     <div class="title">NFQ Akademija</div>
     {% if app.user %}
+        <div>{{ app.user.getFirstName }}  {{ app.user.getLastName }}</div>
         <div><a href="{{ path('logout') }}">Atsijungti</a></div>
+        <div><a href="{{ path('order.showInfo') }}">Užsakyti</a></div>
     {% else %}
         <div><a href="{{ path('login.facebook') }}">Prisijungti</a></div>
     {% endif %}

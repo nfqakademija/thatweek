@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use AppBundle\Utils\Calendar;
 
-/*
+/**
  * Class HomeController
  * @Route("/")
  *
@@ -27,7 +27,7 @@ class HomeController extends Controller
     /**
      * @Route("/logout", name="logout")
      */
-    public function loginAction()
+    public function logoutAction()
     {
 
     }

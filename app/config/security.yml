@@ -18,6 +18,9 @@ security:
             security: false
         main:
             anonymous: ~
+            form_login:
+                login_path: /login/facebook
+                use_referer: true
             logout:
                 path: /logout
                 target: /
@@ -26,4 +29,5 @@ security:
                     - AppBundle\Security\User\Authenticator
 
     access_control:
+            - { path: ^/order, roles: ROLE_USER }
             - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }

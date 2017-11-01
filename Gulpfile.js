@@ -12,7 +12,7 @@ var dir = {
 };
 
 gulp.task('sass', function() {
-    gulp.src(dir.assets + 'style/main.scss')
+    gulp.src(dir.assets + 'style/*')
         .pipe(sass({ outputStyle: 'compressed' }).on('error', sass.logError))
         .pipe(concat('style.css'))
         .pipe(gulp.dest(dir.dist + 'css'));
@@ -25,7 +25,7 @@ gulp.task('scripts', function() {
             dir.npm + 'bootstrap-sass/assets/javascripts/bootstrap.min.js',
 
             // Main JS file
-            dir.assets + 'scripts/main.js'
+            dir.assets + 'scripts/*'
         ])
         .pipe(concat('script.js'))
         .pipe(uglify())

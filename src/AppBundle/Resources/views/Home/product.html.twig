@@ -1,0 +1,26 @@
+{% extends "::base.html.twig" %}
+
+{% block title %}Užsisakyti - {{ parent() }}{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        init('{{weeks|json_encode|raw}}');
+    </script>
+{% endblock %}
+
+{% block body %}
+    <div>
+        <table id="calendar" style="display:inline-block">
+            <tr>
+                <th><div id="calendarLeftBtn" class="calendarBtn" onmousedown="nextMonth(-1)"> < </div></th>
+                <th id="calendar_header" colspan="5"></th>
+                <th><div id="calendarRightBtn" class="calendarBtn" onmousedown="nextMonth(1)"> > </div></th>
+            </tr>
+        </table>
+        <div style="display:inline-block; vertical-align: top;">
+            <div id="weekLabel"></div>
+            <div id="unitsSoldLabel"></div>
+        </div>
+    </div>
+{% endblock %}

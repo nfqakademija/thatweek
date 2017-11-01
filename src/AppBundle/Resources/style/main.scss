@@ -1,2 +1,23 @@
 //bootstrap
 @import "./node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
+
+tr{
+  border-bottom: solid 1px gray;
+}
+
+th{
+  border-top: solid 1px gray;
+  text-align: center;
+}
+td{
+  text-align: center;
+  padding: 5px 5px 5px 5px;
+}
+
+.calendarBtn:hover{
+  cursor: pointer;
+}
+
+.calendarBtn.disabled{
+  color: gray;
+}
