@@ -1,7 +1,7 @@
-set :application, 'kickstart'
+set :application, 'thatweek'
 set :repo_url, '#'
 
-set :deploy_to, '/home/kickstart/'
+set :deploy_to, '/home/thatweek/'
 
 set :archive_cache, true
 set :branch, 'master'
