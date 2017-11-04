@@ -27,6 +27,7 @@ class OAuthClient
     public function connect(Request $request)
     {
         $authorizationUrl = $this->provider->getAuthorizationUrl();
+
         if($request->hasSession())
             $session = $request->getSession();
         else $session = new Session();

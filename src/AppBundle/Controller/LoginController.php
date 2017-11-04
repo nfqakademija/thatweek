@@ -17,7 +17,6 @@ class LoginController extends Controller
 
     /**
      * @Route("/facebook", name="login.facebook")
-     * @param OAuthClient $auth
      */
     public function facebookLoginAction(Request $request, OAuthClient $client)
     {
@@ -29,7 +28,6 @@ class LoginController extends Controller
 
     /**
      * @Route("/facebook/check", name="login.facebook.check")
-     * @param OAuthClient $client
      */
     public function facebookLoginCheckAction(OAuthClient $client)
     {

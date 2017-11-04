@@ -17,3 +17,11 @@ parameters:
 
     # A secret key that's used to generate certain security-related tokens
     secret:            SuperSecretAcademyHashKeyDoNotTellAnyone
+
+    facebook_client:
+        client_id: 1902721706722915
+        client_secret: ecacaf772f3588c8579ef3e46d2b4184
+        redirect_uri: http://localhost:8000/login/facebook/check
+        url_authorize: https://www.facebook.com/v2.10/dialog/oauth
+        url_access_token: https://graph.facebook.com/v2.10/oauth/access_token?
+        url_resource: https://graph.facebook.com/me?fields=

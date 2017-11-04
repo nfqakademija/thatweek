@@ -42,6 +42,16 @@ class Week
      */
     private $unitsSold;
 
+    /**
+     * @ORM\OneToMany(targetEntity="Order", mappedBy="week")
+     */
+    private $orders;
+
+
+    public function __construct()
+    {
+        $this->orders = new ArrayCollection();
+    }
 
     /**
      * Get id

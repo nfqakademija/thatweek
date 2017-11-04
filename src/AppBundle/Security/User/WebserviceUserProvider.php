@@ -21,40 +21,60 @@ class WebserviceUserProvider implements UserProviderInterface
         $this->client = $client;
     }
 
+    /**
+     * @param string $token
+     * @return \AppBundle\Security\User\WebserviceUser
+     */
     public function loadUserByUsername($token)
     {
         $userData = $this->client->getUser($token);
-        $user = new WebserviceUser();
-        $user->createFromArray($userData);
-        if(!$this->userExists($user))
-        {
-            $this->createUser($user);
+
+        /**
+         * @var User
+         */
+        $user = $this->getUser($userData['id']);
+        if($user === NULL) {
+           $user = $this->createUser($userData);
         }
+
+        $webUser = new WebserviceUser($user);
+        return $webUser;
+    }
+
+    /**
+     * @param $userData
+     * @return User
+     */
+    private function createUser($userData)
+    {
+        $user = new User();
+        $user->setApiId($userData['id'])
+            ->setFirstName($userData['first_name'])
+            ->setLastName($userData['last_name']);
+
+        $this->em->persist($user);
+        $this->em->flush();
 
         return $user;
     }
 
-    private function createUser($user)
-    {
-        $this->em->persist($user->generateEntity());
-        $this->em->flush();
-    }
-
-    private function userExists($user)
+    /*private function userExists($user)
     {
         $results = $this->getUser($user->getUsername());
         if($results === NULL)
             return false;
         return true;
-    }
+    }*/
 
     public function loadUserById($id)
     {
-        $user = new WebserviceUser();
-        return $user->createFromEntity($this->getUser($id));
+        return new WebserviceUser($this->getUser($id));
     }
 
-
+    /**
+     * @param $id
+     * @return null|User
+     */
     private function getUser($id)
     {
         return $this->em->getRepository(User::class)->findOneBy(array('apiId' => $id));

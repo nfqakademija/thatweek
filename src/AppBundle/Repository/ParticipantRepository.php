@@ -18,4 +18,13 @@ class ParticipantRepository extends \Doctrine\ORM\EntityRepository
             ->getQuery()
             ->getResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
     }
+
+    public function findByIds($ids)
+    {
+        return $this->createQueryBuilder('participant')
+            ->where('participant.id = :id')
+            ->setParameter('id', $ids)
+            ->getQuery()
+            ->getResult();
+    }
 }

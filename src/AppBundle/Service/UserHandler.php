@@ -18,4 +18,24 @@ class UserHandler
     {
         return $this->em->getRepository(Participant::class)->findByUserId($id);
     }
+
+    public function hydrate($objects)
+    {
+        $array = array();
+
+        /**
+         * @var Participant
+         */
+        foreach($objects as $object)
+        {
+            $fields['id'] =  $object->getId();
+            $fields['firstName'] = $object->getFirstName();
+            $fields['lastName'] = $object->getLastName();
+            $fields['age'] = $object->getAge();
+            $fields['gender'] = $object->getGender();
+            array_push($array, $fields);
+        }
+
+        return $array;
+    }
 }

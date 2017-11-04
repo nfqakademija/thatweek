@@ -5,7 +5,8 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
-        init('{{weeks|json_encode|raw}}');
+        initializeCalendar('{{weeks|json_encode|raw}}');
+        initializeParticipantManager('{{ participants|json_encode|raw }}');
     </script>
 {% endblock %}
 
@@ -24,14 +25,13 @@
         </div>
     </div>
 
-    <div>
-        {% for participant in participants %}
-            <div>{{ participant.firstName }}</div>
-        {% endfor %}
-    </div>
+    <table id="participants">
+    </table>
     <div id="form" style="display: block">
         {{ form_start(participantForm) }}
 
         {{ form_end(participantForm) }}
+        {{ form_start(orderForm) }}
+        {{ form_end(orderForm) }}
     </div>
 {% endblock %}

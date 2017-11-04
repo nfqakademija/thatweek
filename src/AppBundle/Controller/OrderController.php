@@ -2,6 +2,8 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\Order;
+use AppBundle\Form\OrderType;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,21 +26,39 @@ class OrderController extends Controller
                                ParticipantFormHandler $formHandler,
                                 UserHandler $userHandler)
     {
-        $userId = $this->getUser()->getId();
+
+        $user = $this->getUser()->getEntity();
         $participant = new Participant();
         $form = $this->createForm(ParticipantType::class, $participant);
 
-        if($formHandler->handle($request, $form, $userId))
+        if($formHandler->handle($request, $form, $user))
             return $this->redirectToRoute('order.showInfo');//reseting form
 
         $weeks = $calendar->getWeeks();
-        $participants = $userHandler->getParticipants($userId);
+        $participants = $userHandler->hydrate($user->getParticipants());
+
+        $handler = $this->container->get('AppBundle\Service\OrderFormHandler');
+        $order = new Order();
+        $orderForm = $this->createForm(OrderType::class, $order);
+        if($handler->handle($request, $orderForm, $user, $order))
+            return $this->redirectToRoute('homepage');
 
         return $this->render('AppBundle:Home:product.html.twig', array(
             'weeks' => $weeks,
             'participants' => $participants,
-            'participantForm' => $form->createView()
+            'participantForm' => $form->createView(),
+            'orderForm' => $orderForm->createView()
         ));
+    }
+
+    /**
+     * @Route("/proceed", name="order.proceed")
+     */
+    public function proceedAction(Request $request)
+    {
+
+        $request->request->get('data');
+        return $this->redirectToRoute('homepage');
     }
 
 }

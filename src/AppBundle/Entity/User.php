@@ -2,6 +2,7 @@
 
 namespace AppBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -16,26 +17,44 @@ class User
     * @ORM\Id
     * @ORM\GeneratedValue(strategy="AUTO")
     */
-    protected $id;
+    private $id;
 
     /**
      * @ORM\Column(type="string", length=50)
      */
-    protected $apiId;
+    private $apiId;
 
     /**
      * @ORM\Column(type="string", length=50)
      */
-    protected $firstName;
+    private $firstName;
 
     /**
      * @ORM\Column(type="string", length=50)
      */
-    protected $lastName;
+    private $lastName;
+
+    /**
+     * @ORM\OneToMany(targetEntity="Order", mappedBy="user")
+     */
+    private $orders;
+
+    /**
+     * @ORM\OneToMany(targetEntity="Participant", mappedBy="user")
+     */
+    private $participants;
+
+    public function __construct()
+    {
+        $this->orders = new ArrayCollection();
+        $this->participants = new ArrayCollection();
+    }
 
     public function setId($id)
     {
         $this->id = $id;
+
+        return $this;
     }
 
     public function getId()
@@ -46,6 +65,8 @@ class User
     public function setApiId($apiId)
     {
         $this->apiId = $apiId;
+
+        return $this;
     }
 
     public function getApiId()
@@ -56,6 +77,8 @@ class User
     public function setFirstName($firstName)
     {
         $this->firstName = $firstName;
+
+        return $this;
     }
 
     public function getFirstName()
@@ -66,10 +89,46 @@ class User
     public function setLastName($lastName)
     {
         $this->lastName = $lastName;
+
+        return $this;
     }
 
     public function getLastName()
     {
         return $this->lastName;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getOrders()
+    {
+        return $this->orders;
+    }
+
+    /**
+     * @param mixed $orders
+     */
+    public function setOrders($orders)
+    {
+        $this->orders = $orders;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getParticipants()
+    {
+        return $this->participants;
+    }
+
+    /**
+     * @param mixed $participants
+     */
+    public function setParticipants($participants)
+    {
+        $this->participants = $participants;
+    }
+
+
 }

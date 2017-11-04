@@ -8,19 +8,26 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class WebserviceUser implements UserInterface, \Serializable
 {
 
-    private $id;
+    /*private $id;
     private $username;
     private $firstName;
     private $lastName;
-    private $salt;
-    private $roles;
+    private $salt;*/
+    /**
+     * @var User
+     */
+    private $entity;
 
-    public function __construct()
+    /**
+     * WebserviceUser constructor.
+     * @param $entity User
+     */
+    public function __construct(User $entity)
     {
-        return $this;
+        $this->entity = $entity;
     }
 
-    public function createFromArray($data)
+   /* public function createFromArray($data)
     {
         $this->username = $data['id'];
         $this->firstName = $data['first_name'];
@@ -35,51 +42,54 @@ class WebserviceUser implements UserInterface, \Serializable
         $this->firstName = $data->getFirstName();
         $this->lastName = $data->getLastName();
         return $this;
-    }
+    }*/
 
     public function getRoles()
     {
         return array('ROLE_USER');
     }
 
+    /**
+     * @return User
+     */
+    public function getEntity()
+    {
+        return $this->entity;
+    }
+
     public function getId()
     {
-        return $this->id;
+        return $this->entity->getId();
     }
 
     public function getUsername()
     {
-        return $this->username;
+        return $this->entity->getApiId();
     }
 
     public function getSalt()
     {
-        return $this->salt;
+
     }
 
     public function getFirstName()
     {
-        return $this->firstName;
+        return $this->entity->getFirstName();
     }
 
     public function getLastName()
     {
-        return $this->lastName;
-    }
-
-    public function getAccessToken()
-    {
-        return $this->accessToken;
+        return $this->entity->getLastName();
     }
 
     public function getPassword()
     {
-        // TODO: Implement getPassword() method.
+
     }
 
     public function eraseCredentials()
     {
-        // TODO: Implement eraseCredentials() method.
+
     }
 
     public function generateEntity()
@@ -94,10 +104,7 @@ class WebserviceUser implements UserInterface, \Serializable
     public function serialize()
     {
         return serialize(array(
-            $this->id,
-            $this->username,
-            $this->firstName,
-            $this->lastName
+            $this->entity
         ));
     }
 
@@ -105,10 +112,7 @@ class WebserviceUser implements UserInterface, \Serializable
     public function unserialize($serialized)
     {
         list (
-            $this->id,
-            $this->username,
-            $this->firstName,
-            $this->lastName
+            $this->entity
             ) = unserialize($serialized);
     }
 }
