@@ -9,7 +9,7 @@ function initializeParticipantManager(participantsJson)
     for(var i = 0; i < participants.length; i++)
     {
         tableRow = formParticipantRow(participants[i], i);
-        $('#participants').append(tableRow);
+        $('#addParticipantRow').before(tableRow);
         tableRow = '';
     }
     calculateCheckedParticipants();

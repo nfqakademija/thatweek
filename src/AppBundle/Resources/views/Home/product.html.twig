@@ -11,27 +11,47 @@
 {% endblock %}
 
 {% block body %}
-    <div>
-        <table id="calendar" style="display:inline-block">
-            <tr>
-                <th><div id="calendarLeftBtn" class="calendarBtn" onmousedown="nextMonth(-1)"> < </div></th>
-                <th id="calendar_header" colspan="5"></th>
-                <th><div id="calendarRightBtn" class="calendarBtn" onmousedown="nextMonth(1)"> > </div></th>
-            </tr>
-        </table>
-        <div style="display:inline-block; vertical-align: top;">
+    <div class="row">
+        <div class="col-lg-3 col-lg-offset-4">
+            <table id="calendar">
+                <tr>
+                    <th><div id="calendarLeftBtn" class="calendarBtn" onmousedown="nextMonth(-1)"> < </div></th>
+                    <th id="calendar_header" colspan="5"></th>
+                    <th><div id="calendarRightBtn" class="calendarBtn" onmousedown="nextMonth(1)"> > </div></th>
+                </tr>
+            </table>
+        </div>
+        <div class="col-lg-2">
             <div id="weekLabel"></div>
             <div id="unitsSoldLabel"></div>
         </div>
     </div>
 
-    <table id="participants">
-    </table>
-    <div id="form" style="display: block">
-        {{ form_start(participantForm) }}
+    <table id="participants" class="table-striped ">
+        <tr><th colspan="5">Dalyviai</th></tr>
+        <tr id="participantsRow">
+            <th width="30%">Vardas</th>
+            <th width="30%">Pavardė</th>
+            <th width="10%">Amžius</th>
+            <th width="15%">Lytis</th>
+            <th width="15%">Pasirinkti</th>
+        </tr>
 
-        {{ form_end(participantForm) }}
-        {{ form_start(orderForm) }}
-        {{ form_end(orderForm) }}
+        <tr id="addParticipantRow">
+            {{ form_start(participantForm) }}
+            <th>{{ form_widget(participantForm.firstName) }}</th>
+            <th>{{ form_widget(participantForm.lastName) }}</th>
+            <th>{{ form_widget(participantForm.age) }}</th>
+            <th>{{ form_widget(participantForm.gender) }}</th>
+            <th>{{ form_widget(participantForm.submit) }}</th>
+            {{ form_end(participantForm) }}
+        </tr>
+
+    </table>
+
+    {{ form_start(orderForm) }}
+    <div class="col-lg-1 col-lg-offset-10" style="margin-top: 30px">
+        {{ form_widget(orderForm.submit) }}
     </div>
+    {{ form_end(orderForm) }}
 {% endblock %}

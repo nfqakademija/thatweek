@@ -4,6 +4,7 @@ namespace AppBundle\Controller;
 
 use AppBundle\Entity\Order;
 use AppBundle\Form\OrderType;
+use AppBundle\Service\OrderFormHandler;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,7 +25,8 @@ class OrderController extends Controller
     public function ShowAction(Request $request,
                                Calendar $calendar,
                                ParticipantFormHandler $formHandler,
-                                UserHandler $userHandler)
+                                UserHandler $userHandler,
+                                OrderFormHandler $orderFormHandler)
     {
 
         $user = $this->getUser()->getEntity();
@@ -37,10 +39,9 @@ class OrderController extends Controller
         $weeks = $calendar->getWeeks();
         $participants = $userHandler->hydrate($user->getParticipants());
 
-        $handler = $this->container->get('AppBundle\Service\OrderFormHandler');
         $order = new Order();
         $orderForm = $this->createForm(OrderType::class, $order);
-        if($handler->handle($request, $orderForm, $user, $order))
+        if($orderFormHandler->handle($request, $orderForm, $user, $order))
             return $this->redirectToRoute('homepage');
 
         return $this->render('AppBundle:Home:product.html.twig', array(

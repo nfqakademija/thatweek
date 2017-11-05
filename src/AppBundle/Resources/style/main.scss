@@ -1,17 +1,33 @@
 //bootstrap
 @import "./node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
 
-tr{
+$lightGray: #f2f2f2;
+
+.calendarRow{
   border-bottom: solid 1px gray;
+}
+
+.calendarRow:hover{
+  background: $lightGray;
+}
+
+.calendarRow.active{
+  background: #F4FFF2;
 }
 
 th{
   border-top: solid 1px gray;
+  border-bottom: solid 1px gray;
+  padding: 5px 0 5px 0;
   text-align: center;
 }
 td{
   text-align: center;
-  padding: 5px 5px 5px 5px;
+  padding: 10px 10px 10px 10px;
+}
+
+#calendar{
+  margin-bottom: 20px;
 }
 
 .calendarBtn:hover{
@@ -19,5 +35,14 @@ td{
 }
 
 .calendarBtn.disabled{
-  color: gray;
+  color: $lightGray;
+}
+
+#participants{
+  border-bottom: 1px solid gray;
+  margin: auto;
+}
+
+.participantsRow{
+
 }

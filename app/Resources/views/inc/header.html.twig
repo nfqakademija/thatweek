@@ -1,11 +1,20 @@
 {% block body %}
-    <div class="title">NFQ Akademija</div>
+    <nav class="navbar navbar-default">
+        <div class="navbar-header">
+            <div class="navbar-brand">ThatWeek</div>
+        </div>
     {% if app.user %}
-        <div>{{ app.user.getFirstName }}  {{ app.user.getLastName }}</div>
-        <div><a href="{{ path('logout') }}">Atsijungti</a></div>
-        <div><a href="{{ path('order.showInfo') }}">Užsakyti</a></div>
+        <div class="navbar-header navbar-right">
+            <a class="navbar-brand" href="#">{{ app.user.getFirstName }}  {{ app.user.getLastName }}</a>
+        </div>
+        <ul class="nav navbar-nav navbar-right">
+        <li><a href="{{ path('order.showInfo') }}">Užsakyti</a></li>
+        <li><a href="{{ path('logout') }}">Atsijungti</a></li>
+        </ul>
     {% else %}
-        <div><a href="{{ path('login.facebook') }}">Prisijungti</a></div>
+        <ul class="nav navbar-nav navbar-right">
+        <li><a href="{{ path('login.facebook') }}">Prisijungti</a></li>
+        </ul>
     {% endif %}
-
+    </nav>
 {% endblock %}

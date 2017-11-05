@@ -11,11 +11,13 @@
     {% block canonical_meta %}{% endblock %}
 </head>
 <body>
+<div class="container-fluid">
+    {% block header %}
+        {% include "::inc/header.html.twig" %}
+    {% endblock %}
+</div>
 <div class="container">
     {% block container %}
-        {% block header %}
-            {% include "::inc/header.html.twig" %}
-        {% endblock %}
         {% block body %}{% endblock %}
     {% endblock %}
 </div>
