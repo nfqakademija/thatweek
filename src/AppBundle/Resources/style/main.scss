@@ -2,6 +2,7 @@
 @import "./node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
 
 $lightGray: #f2f2f2;
+$softGreen: #F4FFF2;
 
 .calendarRow{
   border-bottom: solid 1px gray;
@@ -12,7 +13,7 @@ $lightGray: #f2f2f2;
 }
 
 .calendarRow.active{
-  background: #F4FFF2;
+  background: $softGreen;
 }
 
 th{
@@ -43,6 +44,22 @@ td{
   margin: auto;
 }
 
-.participantsRow{
+.center{
+  display: block;
+  margin: auto;
+}
 
+.participantsTable{
+  width: 600px;
+  margin:auto;
+  display: table;
+}
+.participantsTable > tbody> tr{
+  background: $lightGray;
+}
+
+.participantsRow{
+  background: white !important;
+  border-top: 1px solid gray;
+  border-bottom: 1px solid gray;
 }

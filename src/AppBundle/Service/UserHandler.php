@@ -4,6 +4,7 @@ namespace AppBundle\Service;
 
 use AppBundle\Entity\Participant;
 use Doctrine\ORM\EntityManager;
+use AppBundle\Entity\User;
 
 class UserHandler
 {
@@ -19,12 +20,20 @@ class UserHandler
         return $this->em->getRepository(Participant::class)->findByUserId($id);
     }
 
-    public function hydrate($objects)
+    /**
+     * @param $user User
+     */
+    public function getOrders($user)
+    {
+        return $user->getOrders();
+    }
+
+    public function hydrateParticipants($objects)
     {
         $array = array();
 
         /**
-         * @var Participant
+         * @var $object Participant
          */
         foreach($objects as $object)
         {

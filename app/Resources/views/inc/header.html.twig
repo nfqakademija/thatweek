@@ -5,7 +5,7 @@
         </div>
     {% if app.user %}
         <div class="navbar-header navbar-right">
-            <a class="navbar-brand" href="#">{{ app.user.getFirstName }}  {{ app.user.getLastName }}</a>
+            <a class="navbar-brand" href="{{ path('profile.show.orders') }}">{{ app.user.getFirstName }}  {{ app.user.getLastName }}</a>
         </div>
         <ul class="nav navbar-nav navbar-right">
         <li><a href="{{ path('order.showInfo') }}">Užsakyti</a></li>

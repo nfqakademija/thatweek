@@ -37,12 +37,13 @@ class OrderController extends Controller
             return $this->redirectToRoute('order.showInfo');//reseting form
 
         $weeks = $calendar->getWeeks();
-        $participants = $userHandler->hydrate($user->getParticipants());
+
+        $participants = $userHandler->hydrateParticipants($user->getParticipants());
 
         $order = new Order();
         $orderForm = $this->createForm(OrderType::class, $order);
         if($orderFormHandler->handle($request, $orderForm, $user, $order))
-            return $this->redirectToRoute('homepage');
+            return $this->redirectToRoute('profile.show.orders');
 
         return $this->render('AppBundle:Home:product.html.twig', array(
             'weeks' => $weeks,

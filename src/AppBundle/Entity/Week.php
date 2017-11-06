@@ -81,7 +81,7 @@ class Week
     /**
      * Get startDate
      *
-     * @return \int
+     * @return \DateTime
      */
     public function getStartDate()
     {
@@ -105,7 +105,7 @@ class Week
     /**
      * Get endDate
      *
-     * @return int
+     * @return \DateTime
      */
     public function getEndDate()
     {
