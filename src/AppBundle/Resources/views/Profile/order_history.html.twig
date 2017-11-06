@@ -1,0 +1,32 @@
+{% extends "::base.html.twig" %}
+
+{% block title %}Istorija - {{ parent() }}{% endblock %}
+
+{% block body %}
+    <table class="participantsTable">
+        <tbody>
+        <tr>
+            <th colspan="3">Užsakymai</th>
+        </tr>
+            <tr>
+                <th>Pradžia</th>
+                <th>Pabaiga</th>
+                <th>Užsakymo data</th>
+            </tr>
+            {% for order in orders %}
+                <tr>
+                    <td>{{ order.week.startDate | date('Y-m-d') }}</td>
+                    <td>{{ order.week.endDate | date('Y-m-d') }}</td>
+                    <td>{{ order.orderedAt | date('Y-m-d h:i') }}</td>
+                </tr>
+                {% for participant in order.participants %}
+                <tr class="participantsRow">
+                    <td></td>
+                    <td>{{ participant.firstName }}</td>
+                    <td>{{ participant.lastName }}</td>
+                </tr>
+                {% endfor %}
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
