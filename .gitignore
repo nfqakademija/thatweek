@@ -17,7 +17,7 @@
 /web/js
 /web/fonts
 /web/photos/*
-!/web/photos
+!/web/photos/.gitkeep
 /node_modules
 .env
 npm-debug.log
