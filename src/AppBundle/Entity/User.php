@@ -44,6 +44,11 @@ class User
      */
     private $participants;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $picture;
+
     public function __construct()
     {
         $this->orders = new ArrayCollection();
@@ -128,6 +133,22 @@ class User
     public function setParticipants($participants)
     {
         $this->participants = $participants;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPicture()
+    {
+        return $this->picture;
+    }
+
+    /**
+     * @param mixed $picture
+     */
+    public function setPicture($picture)
+    {
+        $this->picture = $picture;
     }
 
 

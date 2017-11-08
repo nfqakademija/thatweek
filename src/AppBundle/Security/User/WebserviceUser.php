@@ -8,11 +8,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class WebserviceUser implements UserInterface, \Serializable
 {
 
-    /*private $id;
-    private $username;
-    private $firstName;
-    private $lastName;
-    private $salt;*/
     /**
      * @var User
      */
@@ -26,23 +21,6 @@ class WebserviceUser implements UserInterface, \Serializable
     {
         $this->entity = $entity;
     }
-
-   /* public function createFromArray($data)
-    {
-        $this->username = $data['id'];
-        $this->firstName = $data['first_name'];
-        $this->lastName = $data['last_name'];
-        return $this;
-    }
-
-    public function createFromEntity($data)
-    {
-        $this->id = $data->getId();
-        $this->username = $data->getApiId();
-        $this->firstName = $data->getFirstName();
-        $this->lastName = $data->getLastName();
-        return $this;
-    }*/
 
     public function getRoles()
     {
@@ -82,6 +60,17 @@ class WebserviceUser implements UserInterface, \Serializable
         return $this->entity->getLastName();
     }
 
+    public function setPicture($picture)
+    {
+        $this->entity->setPicture($picture);
+        return $this;
+    }
+
+    public function getPicture()
+    {
+        return $this->entity->getPicture();
+    }
+
     public function getPassword()
     {
 
@@ -90,15 +79,6 @@ class WebserviceUser implements UserInterface, \Serializable
     public function eraseCredentials()
     {
 
-    }
-
-    public function generateEntity()
-    {
-        $entity = new User;
-        $entity->setApiId($this->username);
-        $entity->setFirstName($this->firstName);
-        $entity->setLastName($this->lastName);
-        return $entity;
     }
 
     public function serialize()

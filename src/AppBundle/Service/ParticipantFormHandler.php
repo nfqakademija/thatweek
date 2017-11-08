@@ -30,9 +30,9 @@ class ParticipantFormHandler
 
             $this->em->persist($participant);
             $this->em->flush();
-            return true;
+            return $participant;//TODO
         }
 
-        return false;
+        return null;
     }
 }

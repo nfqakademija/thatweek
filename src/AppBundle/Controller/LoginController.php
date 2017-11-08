@@ -31,7 +31,7 @@ class LoginController extends Controller
      */
     public function facebookLoginCheckAction(OAuthClient $client)
     {
-        return $this->redirectToRoute('homepage');
+        return $this->redirectToRoute('profile.show');
     }
 
 

@@ -1,0 +1,15 @@
+{% extends "AppBundle:Profile:profile.html.twig" %}
+
+{% block body %}
+    {{ parent() }}
+    <div class="row">
+        <div class="col-lg-offset-2 col-lg-1">
+            <div class="personal_info">Vardas</div>
+            <div class="personal_info">Pavardė</div>
+        </div>
+        <div class="col-lg-2">
+            <div class="personal_info">{{ app.user.getFirstName }}</div>
+            <div class="personal_info">{{ app.user.getLastName }}</div>
+        </div>
+    </div>
+{% endblock body %}

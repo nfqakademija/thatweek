@@ -28,7 +28,6 @@ class WebserviceUserProvider implements UserProviderInterface
     public function loadUserByUsername($token)
     {
         $userData = $this->client->getUser($token);
-
         /**
          * @var User
          */
@@ -57,14 +56,6 @@ class WebserviceUserProvider implements UserProviderInterface
 
         return $user;
     }
-
-    /*private function userExists($user)
-    {
-        $results = $this->getUser($user->getUsername());
-        if($results === NULL)
-            return false;
-        return true;
-    }*/
 
     public function loadUserById($id)
     {

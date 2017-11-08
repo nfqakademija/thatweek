@@ -13,6 +13,8 @@ use AppBundle\Service\Calendar;
 use AppBundle\Entity\Participant;
 use AppBundle\Service\ParticipantFormHandler;
 use AppBundle\Service\UserHandler;
+use Symfony\Component\HttpFoundation\Response;
+
 /**
  * Class OrderController
  * @Route("/order")
@@ -24,19 +26,13 @@ class OrderController extends Controller
      */
     public function ShowAction(Request $request,
                                Calendar $calendar,
-                               ParticipantFormHandler $formHandler,
                                 UserHandler $userHandler,
                                 OrderFormHandler $orderFormHandler)
     {
 
         $user = $this->getUser()->getEntity();
         $participant = new Participant();
-        $form = $this->createForm(ParticipantType::class, $participant);
-
-        if($formHandler->handle($request, $form, $user))
-            return $this->redirectToRoute('order.showInfo');//reseting form
-
-        $weeks = $calendar->getWeeks();
+        $ParticipantForm = $this->createForm(ParticipantType::class, $participant);
 
         $participants = $userHandler->hydrateParticipants($user->getParticipants());
 
@@ -46,9 +42,8 @@ class OrderController extends Controller
             return $this->redirectToRoute('profile.show.orders');
 
         return $this->render('AppBundle:Home:product.html.twig', array(
-            'weeks' => $weeks,
             'participants' => $participants,
-            'participantForm' => $form->createView(),
+            'participantForm' => $ParticipantForm->createView(),
             'orderForm' => $orderForm->createView()
         ));
     }
@@ -61,6 +56,19 @@ class OrderController extends Controller
 
         $request->request->get('data');
         return $this->redirectToRoute('homepage');
+    }
+
+    /**
+     * @Route("/participant/add", name="order.participant.add")
+     */
+    public function addParticipantAction(Request $request,  ParticipantFormHandler $formHandler)
+    {
+        $user = $this->getUser()->getEntity();
+        $participant = new Participant();
+        $participantForm = $this->createForm(ParticipantType::class, $participant);
+
+        $participant = $formHandler->handle($request, $participantForm, $user);
+            return new Response(json_encode($participant));
     }
 
 }

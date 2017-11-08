@@ -37,7 +37,7 @@ class UserHandler
          */
         foreach($objects as $object)
         {
-            $fields['id'] =  $object->getId();
+            $fields['id'] = $object->getId();
             $fields['firstName'] = $object->getFirstName();
             $fields['lastName'] = $object->getLastName();
             $fields['age'] = $object->getAge();

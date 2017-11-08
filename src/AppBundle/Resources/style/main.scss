@@ -2,7 +2,9 @@
 @import "./node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
 
 $lightGray: #f2f2f2;
-$softGreen: #F4FFF2;
+$lightGreen: #F4FFF2;
+$darkerLightGreen: #ccffcc;
+$lightYellow: #ffffe6;
 
 .calendarRow{
   border-bottom: solid 1px gray;
@@ -13,7 +15,11 @@ $softGreen: #F4FFF2;
 }
 
 .calendarRow.active{
-  background: $softGreen;
+  background: $lightGreen;
+}
+
+.inline{
+  display: inline-block;
 }
 
 th{
@@ -29,6 +35,7 @@ td{
 
 #calendar{
   margin-bottom: 20px;
+  width: 770px;
 }
 
 .calendarBtn:hover{
@@ -63,3 +70,89 @@ td{
   border-top: 1px solid gray;
   border-bottom: 1px solid gray;
 }
+
+.calendar_arrow_container{
+  margin-right: 6px;
+  text-align: center;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  width: 30px;
+  height: 30px;
+}
+
+.calendar_header{
+  width: 100%;
+  text-align: left;
+  padding-left: 75px;
+  margin-bottom: 20px;
+}
+
+#calendar_headline{
+  width: 210px;
+  height: 30px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  margin-right: 5px;
+  text-align: center;
+}
+
+.calendar_element{
+  border: 1px solid $lightGray;
+  border-radius: 3px;
+  vertical-align: top;
+  display: inline-block;
+  background: $lightGray;
+}
+
+.calendar_element.weekday{
+  text-align: center;
+  height: 25px;
+  width: 100px;
+  color: Gray;
+  float: left;
+  margin: 5px 5px 5px 5px;
+}
+
+.day_container{
+  color: gray;
+  width: 100px;
+  height: 50px;
+  margin: 5px 5px 5px 5px;
+}
+
+.day_container.day{
+  padding: 10px 10px 10px 10px;
+  background: white;
+}
+
+.day_container.day:hover{
+  background: $lightYellow;
+}
+
+.day_container.active{
+  background: $lightGreen;
+}
+
+.day_container.edge{
+  border: 2px gray solid;
+}
+
+.day_container.selected{
+  border: 3px $darkerLightGreen solid;
+}
+.day_container.empty{
+  background: $lightGray;
+}
+
+.personal_info{
+  margin-bottom: 5px;
+  font-size: medium;
+  color: Gray;
+  font-weight: 600;
+}
+
+.profile_button > a{
+  color: Gray;
+  margin-right: 10px;
+}
+

@@ -6,7 +6,6 @@ use AppBundle\Service\UserHandler;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use AppBundle\Entity\User;
-
 /**
  * Class ProfileController
  * @package AppBundle\Controller
@@ -14,6 +13,16 @@ use AppBundle\Entity\User;
  */
 class ProfileController extends Controller
 {
+
+    /**
+     * @Route("/", name="profile.show")
+     */
+    public function showProfileAction()
+    {
+        return $this->render('AppBundle:Profile:user_info.html.twig');
+    }
+
+
     /**
      * @Route("/orders", name="profile.show.orders")
      */
@@ -26,5 +35,4 @@ class ProfileController extends Controller
             'orders' => $orders
         ));
     }
-
 }

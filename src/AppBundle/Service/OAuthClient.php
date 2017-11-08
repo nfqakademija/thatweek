@@ -11,7 +11,7 @@ class OAuthClient
 
     private $provider;
     private $accessToken;
-    private $fieldsToRetrieve = array('first_name', 'last_name', 'id');
+    private $fieldsToRetrieve = array('first_name', 'last_name', 'id', 'picture.type(large)');
 
     public function __construct($facebook_data)
     {
@@ -71,6 +71,11 @@ class OAuthClient
     private function formResourceUrl($url)
     {
         return $url . implode(',', $this->fieldsToRetrieve);
+    }
+
+    public function getPictureUrl()
+    {
+        return $this->getUser($this->accessToken)['picture']['data']['url'];
     }
 
 }

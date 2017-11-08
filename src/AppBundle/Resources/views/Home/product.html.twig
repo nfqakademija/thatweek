@@ -5,7 +5,7 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
-        initializeCalendar('{{weeks|json_encode|raw}}');
+        initializeCalendar();
         initializeParticipantManager('{{ participants|json_encode|raw }}');
     </script>
 {% endblock %}
@@ -13,13 +13,20 @@
 {% block body %}
     <div class="row">
         <div class="col-lg-3 col-lg-offset-4">
-            <table id="calendar">
-                <tr>
-                    <th><div id="calendarLeftBtn" class="calendarBtn" onmousedown="nextMonth(-1)"> < </div></th>
-                    <th id="calendar_header" colspan="5"></th>
-                    <th><div id="calendarRightBtn" class="calendarBtn" onmousedown="nextMonth(1)"> > </div></th>
-                </tr>
-            </table>
+            <div id="calendar">
+                <div class="calendar_header">
+                    <div class="calendar_element calendar_arrow_container inline" onclick="nextMonth(-1)"><</div>
+                    <div id="calendar_headline" class="calendar_element inline">Sausis</div>
+                    <div class="calendar_element calendar_arrow_container inline" onclick="nextMonth(1)">></div>
+                </div>
+                <div class="calendar_element weekday">pirmadienis</div>
+                <div class="calendar_element weekday">antradienis</div>
+                <div class="calendar_element weekday">trečiadienis</div>
+                <div class="calendar_element weekday">ketvirtadienis</div>
+                <div class="calendar_element weekday">penktadienis</div>
+                <div class="calendar_element weekday">šeštadienis</div>
+                <div class="calendar_element weekday">sekmadienis</div>
+            </div>
         </div>
         <div class="col-lg-2">
             <div id="weekLabel"></div>
