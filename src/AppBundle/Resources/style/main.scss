@@ -5,6 +5,7 @@ $lightGray: #f2f2f2;
 $lightGreen: #F4FFF2;
 $darkerLightGreen: #ccffcc;
 $lightYellow: #ffffe6;
+$lightRed: #ffcccc;
 
 .calendarRow{
   border-bottom: solid 1px gray;
@@ -22,6 +23,23 @@ $lightYellow: #ffffe6;
   display: inline-block;
 }
 
+#appbundle_participant_submit, input,select{
+  background: white;
+  border: 1px gray solid;
+  width: 100%;
+  outline: none;
+}
+
+#appbundle_participant_submit:hover, input:hover ,select:hover{
+  border: 1px black solid !important;
+  background: $lightGray;
+}
+
+select{
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
 th{
   border-top: solid 1px gray;
   border-bottom: solid 1px gray;
@@ -35,7 +53,7 @@ td{
 
 #calendar{
   margin-bottom: 20px;
-  width: 770px;
+  width: 780px;
 }
 
 .calendarBtn:hover{
@@ -87,6 +105,14 @@ td{
   margin-bottom: 20px;
 }
 
+#calendar_year_label{
+  display: block;
+  color: Gray;
+  width: 100px;
+  font-size: x-large;
+  margin-right: 0;
+  margin-left: auto;
+}
 #calendar_headline{
   width: 210px;
   height: 30px;
@@ -96,12 +122,17 @@ td{
   text-align: center;
 }
 
+.day_orders{
+  width: 20px;
+  display: block;
+  margin-right: 0;
+  margin-left: auto;
+}
 .calendar_element{
   border: 1px solid $lightGray;
   border-radius: 3px;
   vertical-align: top;
   display: inline-block;
-  background: $lightGray;
 }
 
 .calendar_element.weekday{
@@ -113,8 +144,17 @@ td{
   margin: 5px 5px 5px 5px;
 }
 
+.day_container.day.not_assigned{
+  background: #FAFAFA;
+  color: Gray !important;
+}
+
+.day_container.day.full{
+  background: $lightRed;
+}
+
 .day_container{
-  color: gray;
+  color: black;
   width: 100px;
   height: 50px;
   margin: 5px 5px 5px 5px;
@@ -131,6 +171,14 @@ td{
 
 .day_container.active{
   background: $lightGreen;
+}
+
+.day_container.active.not_assigned{
+  background: $lightRed;
+}
+
+.day_container.active.not_assigned:hover{
+  background: $lightYellow;
 }
 
 .day_container.edge{
@@ -156,3 +204,41 @@ td{
   margin-right: 10px;
 }
 
+.checkbox{
+  display: block;
+  margin:auto !important;
+}
+
+input.parsley-success,
+select.parsley-success,
+textarea.parsley-success {
+  color: #468847;
+  background-color: #DFF0D8;
+  border: 1px solid #D6E9C6;
+}
+
+input.parsley-error,
+select.parsley-error,
+textarea.parsley-error {
+  color: #B94A48;
+  background-color: #F2DEDE;
+  border: 1px solid #EED3D7;
+}
+
+.parsley-errors-list {
+  margin: 2px 0 3px;
+  padding: 0;
+  list-style-type: none;
+  font-size: 0.9em;
+  line-height: 0.9em;
+  opacity: 0;
+
+  transition: all .3s ease-in;
+  -o-transition: all .3s ease-in;
+  -moz-transition: all .3s ease-in;
+  -webkit-transition: all .3s ease-in;
+}
+
+.parsley-errors-list.filled {
+  opacity: 1;
+}

@@ -1,283 +1,327 @@
-var months = [];
-var currentDisplayedMonth = 0;
-var selectedWeek = -1;
-var selectedMonth = -1;
+var serverTime = 0;
+var calendarLimitStart;
+var calendarLimitEnd;
+var calendarLimitByMonths = 12;
+var currentTime;
+var orderStartDate;
+var orderEndDate;
+var orderStartDateCellActive = false;
+var daysInfo = [];
+var admin;
 
 var monthNames = ['Sausis', 'Vasaris', 'Kovas', 'Balandis', 'Gegužė', 'Birželis',
     'Liepa', 'Rugpjūtis', 'Rugsėjis', 'Spalis', 'Lapkritis', 'Gruodis'];
 
-function initializeCalendar(weekJson) {
-    var weeks = JSON.parse(weekJson);
-    var calendarStartingDate = weeks[0]['startDate'];
 
-    for (var i = 0; i < weeks.length; i++) {
-        var weekStartDate = weeks[i]['startDate'];
-        var thisMonth = getMonthFromTimestamp(weekStartDate);
-        var monthIndex = monthDiff(calendarStartingDate, weekStartDate);
-
-        if (monthIndex >= months.length) {
-            months.push(createMonth(monthNames[thisMonth], weekStartDate));
-        }
-        months[monthIndex].weeks.push(weeks[i]);
-    }
-    renderMonth();
-    registerListeners();
-    updateInfoLabels();
-}
-
-function renderMonth() {
-    $('#calendar_header').empty().html(formMonthHeader());
-    $('.calendarRow').remove();
-    enableDisableButtons();
-
-    var currentMonth = months[currentDisplayedMonth];
-    var weekDay = currentMonth.startDay - 1;
-    var tableRow = generateEmptyCells('', weekDay);
-    var weekIndex = 0;
-
-    for (var i = 1; i <= currentMonth.endDay; i++) {
-        weekDay++;
-        tableRow += '<td>' + i + '</td>';
-        if (weekDay % 7 === 0 || i === currentMonth.endDay) {
-            if(weekDay % 7 !== 0) {
-                var cellsToFillRow = 7 - weekDay % 7;
-                tableRow = generateEmptyCells(tableRow, cellsToFillRow);
-            }
-            $('#calendar').append(getFormatedTableRow(tableRow));
-            weekIndex++;
-            tableRow = '';
-        }
-    }
-    updateCalendarRowListeners();
-}
-
-function formMonthHeader() {
-    return months[currentDisplayedMonth].name + ' ' + months[currentDisplayedMonth].year;
-}
-
-function getFormatedTableRow(tableRow) {
-    return '<tr class="calendarRow">' + tableRow + '</tr>';
-}
-
-function startsOnMonday(month) {
-    var date = new Date(month.weeks[0]['startDate'] * 1000);
-    return date.getDate() === 1;
-}
-
-function nextMonth(direction) {
-    if (direction === -1 && currentDisplayedMonth > 0)
-        currentDisplayedMonth--;
-    else if (direction === 1 && currentDisplayedMonth < months.length - 1)
-        currentDisplayedMonth++;
-    else return;
-    renderMonth();
-}
-
-function enableDisableButtons() {
-    var leftButton = $('#calendarLeftBtn');
-    var rightButton = $('#calendarRightBtn');
-    if (currentDisplayedMonth === 0)//disable 'go backwards' button if user is in first month
-        leftButton .toggleClass('disabled');
-    else if (leftButton .hasClass('disabled'))//enable it if user went forward
-        leftButton .toggleClass('disabled');
-
-    if (currentDisplayedMonth === months.length - 1)//disable 'go forward' button if user is in last month
-        rightButton.toggleClass('disabled');
-    else if (rightButton.hasClass('disabled'))//enable it if user went backwards
-        rightButton.toggleClass('disabled');
-}
-
-function registerListeners()
+function initializeAdminCalendar(time)
 {
-    $( '#calendar' ).mouseleave(function() {
-        var week;
-        if(selectedMonth !== -1 && selectedWeek !== -1) {
-            week = months[selectedMonth].weeks[selectedWeek];
-        }
-        updateInfoLabels(week);
-    });
-
+    admin = true;
+    initializeCalendar(time);
 }
 
-function updateCalendarRowListeners()
+function retrieveMonthInfo(date)
 {
-    var calendarRow = $('.calendarRow');
-
-    calendarRow.click(function(){
-        disableCalendarRows();
-        var thisRow = $(this);
-        setWeek(thisRow);
-    });
-
-    calendarRow.mouseover( function() {
-        var thisRow = $(this);
-        showWeekData(thisRow);
-    });
+    var start = getFirstDateOfMonth(date);
+    var end = getLastDayOfMonth(date);
+    var data = {startDate: start.getTime(), endDate: end.getTime()};
+    retrieveDaysInfo(date, data);
 }
 
-function getPreviousMonthLastWeek()
+function initializeUserCalendar(time)
 {
-    var previousMonth = months[currentDisplayedMonth - 1];
-    return previousMonth.weeks.length - 1;
+    initializeCalendar(time);
+    registerMouseLeaveListener();
 }
 
-function disableCalendarRows()
+function registerMouseLeaveListener()
 {
-    $('.calendarRow').each( function () {
-        if($(this).hasClass('active'))
+    $( '#calendar' ).mouseleave(function(){
+        if(orderStartDate != null)
         {
-            $(this).toggleClass('active');
+            var data = {startDate: orderStartDate.getTime(), endDate: orderEndDate.getTime()};
         }
     });
 }
 
-function setWeek(row) {
-    var index = row.index() - 1;
-    var currentMonth = months[currentDisplayedMonth];
-    var week;
-    if (!startsOnMonday(currentMonth))
-    {
-        if(index === 0) {
-            if(currentDisplayedMonth > 0)
-            {
-                setDate(currentDisplayedMonth - 1, getPreviousMonthLastWeek());
-                week = months[selectedMonth].weeks[selectedWeek];
-                selectWeek(week, row);
-            }
-            else{
-                setDate(-1, -1);//if it's current month, we don't have any data about the last week from previous month
-                setFormsWeek(-1);
-            }
-            return;
-        }
-        index--;//if months doesn't start on monday, it has one additional week at beginning from other month,
-        // we have to decrease it, so that index = 0 would be equal to first week of this month (first week that start on monday)
-    }
-    setDate(currentDisplayedMonth, index);
-    week = currentMonth.weeks[index];
-    selectWeek(week, row);
-}
-
-/*function highlightWeek()
+function retrieveDaysInfo(date, data)
 {
-    if()
-    $('.calendarRow').each(function() {
-        var thisRow = $(this);
-        if(thisRow.index())
+    $.ajax({
+        url: "/order/check",
+        cache: false,
+        type: 'POST',
+        dataType: 'json',
+        data: data,
+        success: function(data){
+            daysInfo[date.getTime()] = data;
+            if(admin != null)
+                updateDaysOrderLabels();
+            else
+                paintSelectedCells();
+        }
     });
-}*/
-
-function setDate(month, week)
+}
+function initializeCalendar(time)
 {
-    selectedMonth = month;
-    selectedWeek = week;
-}
-function showWeekData(row) {
-    var index = row.index() - 1;
-    var currentMonth = months[currentDisplayedMonth];
-    var week;
-    if(!startsOnMonday(currentMonth)) {
-        if (index == '0') {
-            if (currentDisplayedMonth > 0) {
-                week = months[currentDisplayedMonth - 1].weeks[getPreviousMonthLastWeek()];
-            }
-            else {
-                week = null;
-            }
-            updateInfoLabels(week);
-            return;
-        }
-        index--;
-    }
-    week = months[currentDisplayedMonth].weeks[index];
-    updateInfoLabels(week);
+    serverTime = time * 1000;
+    currentTime = new Date(serverTime);
+    calendarLimitStart = getDateClone(currentTime);
+    calendarLimitEnd = getDateClone(currentTime);
+    calendarLimitEnd.setMonth(calendarLimitEnd.getMonth() + calendarLimitByMonths);
+    renderMonth();
+
 }
 
-function selectWeek(week, row)
+function renderMonth()
 {
-    setFormsWeek(week['id']);
-    row.toggleClass('active');
-}
+    var monthStartDay = getFirstDayOfMonth(currentTime);
+    var cells = generateEmptyCells(monthStartDay - 1);
+    var daysInCurrentMonth = getDaysInMonth(currentTime);
 
-function setFormsWeek(id)
-{
-    $('#appbundle_order_week').val(id);
-}
+    retrieveMonthInfo(currentTime);
 
-function updateInfoLabels(data) {
-    var weekLabel = $('#weekLabel');
-    var unitsSoldLabel = $('#unitsSoldLabel');
-    if(data == null)
+    $('#calendar_headline').html(monthNames[currentTime.getMonth()]);
+    $('#calendar_year_label').html(currentTime.getFullYear());
+    $('.day_container').remove();
+    for(var i = 1; i <= daysInCurrentMonth; i++)
     {
-        weekLabel.html('Nepasirinkta savaitė');
-        unitsSoldLabel.html('');
+        cells += formDayCell(i);
+    }
+
+    var cellsToFinish = 7 - getLastWeekDayOfMonth(currentTime);
+    cellsToFinish = cellsToFinish === 7?0:cellsToFinish;
+    cells += generateEmptyCells(cellsToFinish);
+
+    $('#calendar').append(cells);
+    updateCalendarListeners();
+    if(orderStartDate !== null)
+        paintSelectedCells();
+}
+
+function generateEmptyCells(cellCount) {
+    cellCount = cellCount < 0 ? 6 : cellCount;
+    var cells  = '';
+    for (var i = 0; i < cellCount; i++) {
+        cells += '<div class="calendar_element day_container empty"></div>';
+    }
+    return cells;
+}
+
+
+function formDayCell(number)
+{
+    return '<div class="calendar_element day_container day"><div class="day_number">' + number + '</div>' +
+        '<div class="day_orders"></div></div>';
+}
+
+function updateCalendarListeners() {
+    $('.day_container').click(function () {
+        var index = $(this).index('.day');
+        if(index !== -1) {
+            var day = index + 1;
+            updateOrderDates(day);
+        }
+    });
+}
+
+function updateOrderDates(day)
+{
+    var clickedDate = getDateClone(currentTime);
+    clickedDate.setDate(day);
+    if(orderStartDate == null)//On first click on calendar
+    {
+        orderStartDate = getDateClone(clickedDate);
+        orderEndDate = getDateClone(clickedDate);
+    }
+    else if(isDatesEqual(clickedDate, orderStartDate) && !orderStartDateCellActive)//if clicked on order start date - highlight it and allow to change
+    {
+        orderStartDateCellActive = true;
+    }
+    else if(orderStartDateCellActive) {
+        changeActiveCellsWhenFirstIsSelected(clickedDate);
+    }
+    else if(clickedDate > orderStartDate)
+        orderEndDate = getDateClone(clickedDate);
+    else if(clickedDate < orderStartDate)
+        orderStartDate = getDateClone(clickedDate);
+
+    updateOrderDatesInForm();
+    paintSelectedCells();
+}
+
+function changeActiveCellsWhenFirstIsSelected(clickedDate)
+{
+    if(isDatesEqual(orderStartDate, orderEndDate)) {//when only one cell is active, move both dates to clicked date
+        orderEndDate = getDateClone(clickedDate);
+        orderStartDate = getDateClone(clickedDate);
+    }
+    else if(clickedDate < orderEndDate) {
+        orderStartDate = getDateClone(clickedDate);
+    }
+    else if(clickedDate > orderEndDate){//swap start and end dates, if user moved starting date to later date than ending
+        orderStartDate = getDateClone(orderEndDate);
+        orderEndDate = getDateClone(clickedDate);
     }
     else {
-        weekLabel.html(getFullDate(data['startDate']) + ' - ' + getFullDate(data['endDate']));
-        unitsSoldLabel.html('Užimtų vietų ' + data['unitsSold']);
+        orderStartDate = getDateClone(orderEndDate);
+    }
+    orderStartDateCellActive = false;
+}
+
+function paintSelectedCells()
+{
+    resetPaintedCells();
+    var date = getDateClone(currentTime);
+    var key = currentTime.getTime();
+    if(key in daysInfo) {
+        var month = daysInfo[key];
+        var counter = 0;
+        $('.day_container').each(function () {
+            var field = $(this);
+            var dayNumber = field.index('.day') + 1;
+            if (dayNumber > 0) {
+                date.setDate(dayNumber);
+                var end = counter>=month.length?true:false;
+                var isEmpty = true;
+                if (!end) {
+                    var day = month[counter];
+                    isEmpty = !(dayNumber === getDayFromTimestamp(day['date']));
+                    if (!isEmpty) {
+                        if (day['capacity'] === 0)
+                            field.toggleClass('not_assigned');
+                        else if (day['capacity'] <= day['orderCount'])
+                            field.toggleClass('full');
+                        counter++;
+
+                    }
+                }
+                if(isEmpty)
+                    field.toggleClass('not_assigned');
+                if (orderStartDate <= date && date <= orderEndDate) {
+                    field.toggleClass('active');
+
+                    if (isDatesEqual(orderStartDate, date) || isDatesEqual(orderEndDate, date)) {
+                        if (isDatesEqual(orderStartDate, date) && orderStartDateCellActive === true)
+                            field.toggleClass('selected');
+                        field.toggleClass('edge');
+                    }
+                }
+            }
+        });
     }
 }
 
-function resetInfoLabels() {
-    $('#weekLabel').empty();
-    $('#unitsSoldLabel').empty();
+function updateOrderDatesInForm()
+{
+    $('#app_calendar_startDate').val(orderStartDate.getTime());
+    $('#app_calendar_endDate').val(orderEndDate.getTime());
 }
 
-function getFullDate(timestamp) {
-    var date = new Date(timestamp * 1000);
-    return date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate();
+function resetPaintedCells()
+{
+    $('.day_container').each(function () {
+        var cell = $(this);
+        if(cell.hasClass('active'))
+            cell.toggleClass('active');
+        if(cell.hasClass('edge'))
+            cell.toggleClass('edge');
+        if(cell.hasClass('selected'))
+            cell.toggleClass('selected');
+        if(cell.hasClass('full'))
+            cell.toggleClass('full');
+        if(cell.hasClass('not_assigned'))
+            cell.toggleClass('not_assigned');
+    });
 }
 
-function getMonthFromTimestamp(timestamp) {
-    var date = new Date(timestamp * 1000);
-    return date.getMonth();
+function nextMonth(direction)
+{
+    var nextMonth = getDateClone(currentTime);
+    nextMonth.setMonth(nextMonth.getMonth() + direction);
+    if(monthDiff(calendarLimitStart, nextMonth) >= 0 && monthDiff(calendarLimitEnd, nextMonth) <= 0)
+    {
+        currentTime = getDateClone(nextMonth);
+        renderMonth();
+    }
 }
 
-function getYearFromTimestamp(timestamp) {
-    var date = new Date(timestamp * 1000);
-    return date.getFullYear();
+function updateDaysOrderLabels()
+{
+    var key = currentTime.getTime();
+    if(key in daysInfo)
+    {
+        var month = daysInfo[key];
+        var counter = 0;
+        $('.day_orders').each(function(index)
+        {
+            var field = $(this);
+            var matched = false;
+            if(counter < month.length)
+                matched = setDayOrderLabel(counter, month, field, index);
+
+            if(matched)
+                counter++;
+            else
+                field.html('0');
+        });
+    }
 }
 
-function getFirstDayOfMonth(timestamp) {
+function setDayOrderLabel(counter, month, field, index)
+{
+    var day = month[counter];
+    if (getDayFromTimestamp(day['date']) === index + 1) {
+        field.html(day['orderCount'] + '/' + day['capacity']);
+        return true;
+    }
+    return false
+}
+
+
+function getDayFromTimestamp(timestamp)
+{
     var date = new Date(timestamp * 1000);
+    return date.getDate();
+}
+
+function getFirstDayOfMonth(date) {
+    return getFirstDateOfMonth(date).getDay();
+}
+
+function getFirstDateOfMonth(date)
+{
     var y = date.getFullYear();
     var x = date.getMonth();
-    var firstDayDate = new Date(y, x, 1);
-    return firstDayDate.getDay();
+    return new Date(y, x, 1);
 }
 
-function getLastDayOfMonth(timestamp) {
-    var date = new Date(timestamp * 1000);
+function getDaysInMonth(date)
+{
+    return getLastDayOfMonth(date).getDate();
+}
+function getLastWeekDayOfMonth(date) {
+    return getLastDayOfMonth(date).getDay();
+}
+
+function getLastDayOfMonth(date) {
     var y = date.getFullYear();
     var x = date.getMonth();
-    var lastDayDate = new Date(y, x + 1, 0);
-    return lastDayDate.getDate();
+    return new Date(y, x + 1, 0);
 }
 
 function monthDiff(first, second) {
     var difference;
-    first = new Date(first * 1000);
-    second = new Date(second * 1000);
     difference = (second.getFullYear() - first.getFullYear()) * 12;
     difference -= first.getMonth();
     difference += second.getMonth();
-    return difference <= 0 ? 0 : difference;
+    return difference;
 }
 
-function createMonth(name, weekStartDate) {
-    return {
-        name: name,
-        year: getYearFromTimestamp(weekStartDate),
-        weeks: [],
-        startDay: getFirstDayOfMonth(weekStartDate),
-        endDay: getLastDayOfMonth(weekStartDate)
-    };
+function isDatesEqual(date1, date2)
+{
+    return date1.getTime() === date2.getTime();
 }
 
-function generateEmptyCells(row, cells) {
-    cells = cells < 0 ? 6 : cells;
-    for (var i = 0; i < cells; i++) {
-        row += '<td></td>';
-    }
-    return row;
+function getDateClone(date)
+{
+    return new Date(date.getTime());
 }

@@ -23,6 +23,7 @@ gulp.task('scripts', function() {
             //Third party assets
             dir.npm + 'jquery/dist/jquery.min.js',
             dir.npm + 'bootstrap-sass/assets/javascripts/bootstrap.min.js',
+            dir.npm + 'parsleyjs/dist/parsley.min.js',
 
             // Main JS file
             dir.assets + 'scripts/*'

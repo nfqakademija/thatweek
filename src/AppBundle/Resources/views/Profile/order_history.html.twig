@@ -16,8 +16,8 @@
             </tr>
             {% for order in orders %}
                 <tr>
-                    <td>{{ order.week.startDate | date('Y-m-d') }}</td>
-                    <td>{{ order.week.endDate | date('Y-m-d') }}</td>
+                    <td>{{ order.startDate | date('Y-m-d') }}</td>
+                    <td>{{ order.endDate | date('Y-m-d') }}</td>
                     <td>{{ order.orderedAt | date('Y-m-d h:i') }}</td>
                 </tr>
                 {% for participant in order.participants %}

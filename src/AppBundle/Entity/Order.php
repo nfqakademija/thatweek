@@ -31,18 +31,24 @@ class Order
     private $orderedAt;
 
     /**
-     * @var int
+     * @var User
      * @ORM\ManyToOne(targetEntity="User", inversedBy="orders")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
      */
     private $user;
 
+
     /**
-     * @var int
-     * @ORM\ManyToOne(targetEntity="Week", inversedBy="orders")
-     * @ORM\JoinColumn(name="week_id", referencedColumnName="id")
+     * @var \DateTime
+     * @ORM\Column(type="datetime")
      */
-    private $week;
+    private $startDate;
+
+    /**
+     * @var \DateTime
+     * @ORM\Column(type="datetime")
+     */
+    private $endDate;
 
     /**
      * @ORM\ManyToMany(targetEntity="Participant")
@@ -69,7 +75,7 @@ class Order
     }
 
     /**
-     * @return int
+     * @return User
      */
     public function getUser()
     {
@@ -77,7 +83,7 @@ class Order
     }
 
     /**
-     * @param int $user
+     * @param User $user
      *
      * @return Order
      */
@@ -114,32 +120,47 @@ class Order
     }
 
     /**
-     * @return int
-     */
-    public function getWeek()
-    {
-        return $this->week;
-    }
-
-    /**
-     * @param int $week
-     *
-     * @return Order
-     */
-    public function setWeek($week)
-    {
-        $this->week = $week;
-
-        return $this;
-    }
-
-    /**
      * @return mixed
      */
     public function getParticipants()
     {
         return $this->participants;
     }
+
+    /**
+     * @return \DateTime
+     */
+    public function getStartDate()
+    {
+        return $this->startDate;
+    }
+
+    /**
+     * @param \DateTime $startDate
+     */
+    public function setStartDate($startDate)
+    {
+        $this->startDate = $startDate;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getEndDate()
+    {
+        return $this->endDate;
+    }
+
+    /**
+     * @param \DateTime $endDate
+     */
+    public function setEndDate($endDate)
+    {
+        $this->endDate = $endDate;
+    }
+
+
+
 
 }
 

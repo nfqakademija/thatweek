@@ -35,6 +35,11 @@ class User
     private $lastName;
 
     /**
+     * @ORM\Column(type="json_array")
+     */
+    private $roles = array();
+
+    /**
      * @ORM\OneToMany(targetEntity="Order", mappedBy="user")
      */
     private $orders;
@@ -106,6 +111,35 @@ class User
     /**
      * @return mixed
      */
+    public function getRoles()
+    {
+        return $this->roles;
+    }
+
+    /**
+     * @param mixed $roles
+     * @return User
+     */
+    public function setRoles($roles)
+    {
+        $this->roles = $roles;
+
+        return $this;
+    }
+
+    /**
+     * @param $role String
+     */
+    public function addRole($role)
+    {
+        array_push($this->roles, $role);
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
     public function getOrders()
     {
         return $this->orders;
@@ -113,10 +147,13 @@ class User
 
     /**
      * @param mixed $orders
+     * @return User
      */
     public function setOrders($orders)
     {
         $this->orders = $orders;
+
+        return $this;
     }
 
     /**
@@ -129,10 +166,13 @@ class User
 
     /**
      * @param mixed $participants
+     * @return User
      */
     public function setParticipants($participants)
     {
         $this->participants = $participants;
+
+        return $this;
     }
 
     /**
@@ -145,10 +185,12 @@ class User
 
     /**
      * @param mixed $picture
+     * @return User
      */
     public function setPicture($picture)
     {
         $this->picture = $picture;
+        return $this;
     }
 
 

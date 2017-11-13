@@ -5,6 +5,7 @@ namespace AppBundle\Service;
 use AppBundle\Entity\Participant;
 use Doctrine\ORM\EntityManager;
 use AppBundle\Entity\User;
+use Symfony\Component\Config\Definition\Exception\Exception;
 
 class UserHandler
 {
@@ -31,7 +32,6 @@ class UserHandler
     public function hydrateParticipants($objects)
     {
         $array = array();
-
         /**
          * @var $object Participant
          */

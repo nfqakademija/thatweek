@@ -3,6 +3,7 @@
 namespace AppBundle\Service;
 
 use Doctrine\ORM\EntityManager;
+use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\FormInterface;
 use AppBundle\Entity\User;
@@ -18,6 +19,12 @@ class ParticipantFormHandler
         $this->em = $em;
     }
 
+    /**
+     * @param Request $request
+     * @param FormInterface $form
+     * @param User $user
+     * @return boolean
+     */
     public function handle(Request $request,FormInterface $form, User $user)
     {
 
@@ -30,9 +37,9 @@ class ParticipantFormHandler
 
             $this->em->persist($participant);
             $this->em->flush();
-            return $participant;//TODO
+            return true;
         }
 
-        return null;
+        return false;
     }
 }

@@ -4,20 +4,23 @@
 
 {% block javascripts %}
     {{ parent() }}
-    <script>
-        initializeCalendar();
+    <script type="text/javascript">
+        initializeUserCalendar({{serverTime}});
         initializeParticipantManager('{{ participants|json_encode|raw }}');
+        $("[name='appbundle_participant']").parsley();
     </script>
 {% endblock %}
 
 {% block body %}
+
     <div class="row">
-        <div class="col-lg-3 col-lg-offset-4">
-            <div id="calendar">
+        <div class="col-lg-offset-2">
+            <div id="calendar" >
                 <div class="calendar_header">
                     <div class="calendar_element calendar_arrow_container inline" onclick="nextMonth(-1)"><</div>
                     <div id="calendar_headline" class="calendar_element inline">Sausis</div>
                     <div class="calendar_element calendar_arrow_container inline" onclick="nextMonth(1)">></div>
+                    <div id="calendar_year_label"></div>
                 </div>
                 <div class="calendar_element weekday">pirmadienis</div>
                 <div class="calendar_element weekday">antradienis</div>
@@ -34,28 +37,26 @@
         </div>
     </div>
 
+    {{ form_start(participantForm) }}
     <table id="participants" class="table-striped ">
         <tr><th colspan="5">Dalyviai</th></tr>
-        <tr id="participantsRow">
+        <tr>
             <th width="30%">Vardas</th>
             <th width="30%">Pavardė</th>
             <th width="10%">Amžius</th>
             <th width="15%">Lytis</th>
             <th width="15%">Pasirinkti</th>
         </tr>
-
         <tr id="addParticipantRow">
-            {{ form_start(participantForm) }}
-            <th>{{ form_widget(participantForm.firstName) }}</th>
-            <th>{{ form_widget(participantForm.lastName) }}</th>
-            <th>{{ form_widget(participantForm.age) }}</th>
-            <th>{{ form_widget(participantForm.gender) }}</th>
-            <th>{{ form_widget(participantForm.submit) }}</th>
-            {{ form_end(participantForm) }}
+            <td valign="top">{{ form_widget(participantForm.firstName) }}</td>
+            <td valign="top">{{ form_widget(participantForm.lastName) }}</td>
+            <td valign="top">{{ form_widget(participantForm.age) }}</td>
+            <td valign="top">{{ form_widget(participantForm.gender) }}</td>
+            <td valign="top">{{ form_widget(participantForm.submit) }}
+                <i id="participant_submit_spinner" class="fa fa-circle-o-notch fa-spin" style="font-size:24px; display:none;"></i></td>
         </tr>
-
     </table>
-
+    {{ form_end(participantForm) }}
     {{ form_start(orderForm) }}
     <div class="col-lg-1 col-lg-offset-10" style="margin-top: 30px">
         {{ form_widget(orderForm.submit) }}

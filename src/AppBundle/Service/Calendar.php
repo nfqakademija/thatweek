@@ -3,7 +3,7 @@
 namespace AppBundle\Service;
 
 use Doctrine\ORM\EntityManager;
-use AppBundle\Entity\Week;
+use AppBundle\Entity\Day;
 
 class Calendar
 {
@@ -22,7 +22,7 @@ class Calendar
 
     public function getWeeks()
     {
-        $weeks = $this->em->getRepository(Week::class)->findBetween($this->fromDate, $this->toDate);
+        $weeks = $this->em->getRepository(Day::class)->findBetween($this->fromDate, $this->toDate);
         return $this->createWeeks($weeks);
     }
 
@@ -73,7 +73,7 @@ class Calendar
     private function getNewWeek($startDate)
     {
         $endOfWeekDate = strtotime('+6 days', $startDate);
-        $week = new Week();
+        $week = new Day();
         $week->setStartDate($startDate)
             ->setEndDate($endOfWeekDate)
             ->setUnitsSold(0);

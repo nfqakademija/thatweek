@@ -49,8 +49,8 @@ class WebserviceUserProvider implements UserProviderInterface
         $user = new User();
         $user->setApiId($userData['id'])
             ->setFirstName($userData['first_name'])
-            ->setLastName($userData['last_name']);
-
+            ->setLastName($userData['last_name'])
+            ->addRole('ROLE_USER');
         $this->em->persist($user);
         $this->em->flush();
 

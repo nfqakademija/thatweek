@@ -9,6 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 
 class ParticipantType extends AbstractType
 {
@@ -18,9 +19,17 @@ class ParticipantType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('firstName', TextType::class, array('label' => 'Vardas'))
-            ->add('lastName', TextType::class, array('label' => 'Pavardė'))
-            ->add('age', TextType::class, array('label' => 'Amžius'))
+            ->add('firstName', TextType::class, array('label' => 'Vardas', 'attr' => array(
+                'data-parsley-required' => 'true',
+                'data-parsley-pattern' => '[A-Ž a-ž]+'
+            )))
+            ->add('lastName', TextType::class, array('label' => 'Pavardė', 'attr' => array(
+                'data-parsley-required' => 'true',
+                'data-parsley-pattern' => '[A-Ž a-ž]+'
+            )))
+            ->add('age', TextType::class, array('label' => 'Amžius', 'attr' => array(
+                'data-parsley-range' => '[5, 16]'
+            )))
             ->add('gender', ChoiceType::class, array(
                 'label' => 'Lytis',
                 'choices' => array(
@@ -29,7 +38,7 @@ class ParticipantType extends AbstractType
                     'moteris' => 'f'
                 )
             ))
-            ->add('submit', SubmitType::class, array('label' => 'Pridėti'))
+            ->add('submit', ButtonType::class, array('label' => 'Pridėti'))
         ;
     }
     
