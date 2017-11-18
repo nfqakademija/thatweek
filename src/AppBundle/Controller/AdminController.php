@@ -2,8 +2,11 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\Order;
 use AppBundle\Form\DayUpdateType;
+use AppBundle\Form\OrderType;
 use AppBundle\Service\DayHandler;
+use AppBundle\Service\OrderHandler;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,15 +21,54 @@ class AdminController extends Controller
     /**
      * @Route("/", name="admin.home")
      */
-    public function indexAction(Request $request, DayHandler $dayHandler)
+    public function indexAction()
     {
-        $updateForm = $this->createForm(DayUpdateType::class);
+        return $this->render('AppBundle:Admin:index.html.twig');
+    }
 
-        $dayHandler->handle($request, $updateForm);
+    /**
+     * @Route("/calendar", name="admin.calendar")
+     */
+    public function showDaysAction(Request $request, DayHandler $dayHandler)
+    {
+        $daysUpdateForm = $this->createForm(DayUpdateType::class);
 
-        return $this->render('AppBundle:Admin:calendar_manager.html.twig', array(
+        $dayHandler->handle($request, $daysUpdateForm);
+
+        return $this->render('AppBundle:Admin:day_info.html.twig', array(
             'serverTime' => strtotime(date('Y-m-d')),
-            'update_form' => $updateForm->createView()
+            'update_form' => $daysUpdateForm->createView()
+        ));
+    }
+
+    /**
+     * @Route("/order/edit/{id}", name="admin.order.edit")
+     */
+    public function editAction(Request $request, OrderHandler $orderHandler, DayHandler $dayHandler, $id)
+    {
+        $order = $orderHandler->getOrder($id);
+        $dates = array(
+            'startDate' => $order->getStartDate()->getTimestamp(),
+            'endDate' => $order->getEndDate()->getTimestamp()
+        );
+        $user = $order->getUser();
+        $orderEditForm = $this->createForm(OrderType::class, $order);
+
+
+        if($orderHandler->handle($request, $orderEditForm, $user, $order))
+            return $this->redirectToRoute('admin.calendar');
+
+        $daysUpdateForm = $this->createForm(DayUpdateType::class);
+        $participants = $orderHandler->getParticipants($order, $user);
+
+        $dayHandler->handle($request, $daysUpdateForm);
+
+        return $this->render('AppBundle:Admin:order_edit.html.twig', array(
+            'participants' => $participants,
+            'dates'=> $dates,
+            'orderForm' => $orderEditForm->createView(),
+            'update_form' => $daysUpdateForm->createView(),
+            'serverTime' => strtotime(date('Y-m-d'))
         ));
     }
 }

@@ -39,10 +39,10 @@ class OrderController extends Controller
 
         if($participantFormHandler->handle($request, $participantForm, $user))
         {
-            $participants = $userHandler->hydrateParticipants($user->getParticipants());
-            return new Response(\GuzzleHttp\json_encode($participants));
+            $participants = $userHandler->participantsToArray($user->getParticipants());
+            return new JsonResponse($participants);
         }
-        $participants = $userHandler->hydrateParticipants($user->getParticipants());
+        $participants = $userHandler->participantsToArray($user->getParticipants());
 
         $order = new Order();
         $orderForm = $this->createForm(OrderType::class, $order);
@@ -66,7 +66,16 @@ class OrderController extends Controller
         $startDate = $request->request->get('startDate');
         $endDate = $request->request->get('endDate');
         $days = $orderHandler->getDaysWithOrders($startDate, $endDate);
-        return new Response(\GuzzleHttp\json_encode($days));
+        return new JsonResponse($days);
     }
 
+    /**
+     * @Route("/get", name="order.get")
+     */
+    public function getAction(Request $request, OrderHandler $orderHandler)
+    {
+        $date = $request->request->get('date');
+        $orders = $orderHandler->getOrdersInDay($date);
+        return new JsonResponse($orders);
+    }
 }

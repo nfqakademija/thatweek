@@ -8,7 +8,9 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use AppBundle\Entity\Order;
@@ -19,13 +21,15 @@ use AppBundle\Entity\Day;
 class OrderHandler
 {
 
-    private $em;
-    private $dayHandler;
+    protected $em;
+    protected $dayHandler;
+    protected $userHandler;
 
-    public function __construct(EntityManager $em, DayHandler $dayHandler)
+    public function __construct(EntityManager $em, DayHandler $dayHandler, UserHandler $userHandler)
     {
         $this->em = $em;
         $this->dayHandler = $dayHandler;
+        $this->userHandler = $userHandler;
     }
 
     /**
@@ -37,23 +41,64 @@ class OrderHandler
      */
     public function handle(Request $request, FormInterface $form, User $user, Order $order)
     {
-
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $participantList = $form['participants']->getData();
 
-            $startDate = $form['startDate']->getData();
-            $endDate = $form['endDate']->getData();
-            $this->updateDays($order, $startDate, $endDate);
-            $order = $this->setParticipants($participantList, $order);
-            $order->setUser($user);
-            $this->em->persist($order);
-            $this->em->flush();
-            return true;
+            $startTimestamp = $form['startDate']->getData();
+            $endTimestamp = $form['endDate']->getData();
+            $foundDays = $this->getDaysBetweenTimestamps($startTimestamp, $endTimestamp);
+
+            if($this->isSetToBeDeleted($form, $order))
+                return true;
+
+            if($this->isOrderValid($form, $foundDays))
+            {
+                $this->updateDays($order, $foundDays);
+                $order = $this->setParticipants($participantList, $order);
+                $order->setUser($user);
+                $this->setDates($order, $startTimestamp, $endTimestamp);
+
+                if(empty($order->getId()))
+                    $this->em->persist($order);
+
+                $this->em->flush();
+                return true;
+            }
+
+            $form->addError(new FormError('Pasirinktos negalimos dienos.'));
+        }
+        return false;
+    }
+
+    /**
+     * @param $form FormInterface
+     * @param $foundDays array
+     * @return bool
+     */
+    private function isOrderValid($form, $foundDays)
+    {
+        $participantList = $form['participants']->getData();
+        $startDate = $this->dayHandler->timestampToDate($form['startDate']->getData());
+        $endDate = $this->dayHandler->timestampToDate($form['endDate']->getData());
+        $participants = explode(',', $participantList);
+
+        $actualDays = $this->dayHandler->createDatesBetween($startDate, $endDate);
+        if(count($actualDays) !== count($foundDays))
+            return false;
+
+        /**
+         * @var $foundDay Day
+         */
+        foreach ($foundDays as $foundDay)
+        {
+            $unitsSold = $this->getUnitsSold($foundDay, $participants);
+            if($foundDay->getCapacity() < $unitsSold)
+                return false;
         }
 
-        return false;
+        return true;
     }
 
     /**
@@ -68,6 +113,35 @@ class OrderHandler
     }
 
     /**
+     * @param $form FormInterface
+     * @param $order Order
+     * @return bool
+     */
+    private function isSetToBeDeleted($form, $order)
+    {
+        if(!empty($form->has('delete')))
+        {
+            if($form->get('delete')->isClicked()) {
+                $this->em->remove($order);
+                $this->em->flush();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param $order Order
+     */
+    private function setDates($order, $startTimestamp, $endTimestamp)
+    {
+        $date = new \DateTime();
+        $order->setStartDate($date->setTimestamp(floor($startTimestamp / 1000)));
+        $date = new \DateTime();
+        $order->setEndDate($date->setTimestamp(floor($endTimestamp / 1000)));
+    }
+
+    /**
      * @param $participantList string
      * @param $order Order
      * @return Order
@@ -75,27 +149,76 @@ class OrderHandler
     private function setParticipants($participantList, $order)
     {
         $entities = $this->getEntities($participantList);
+
+        $order = $this->removeUncheckedParticipants($entities, $order);
+        /**
+         * @var $entity Participant
+         * @var $order Order
+         */
         foreach ($entities as $entity) {
-            $order->getParticipants()->add($entity);
+            if(!$order->getParticipants()->contains($entity))
+                $order->addParticipant($entity);
         }
         return $order;
     }
 
     /**
+     * @param $currentParticipants array
      * @param $order Order
-     * @param $startTimestamp integer
-     * @param $endTimestamp integer
+     * @return Order
      */
-    private function updateDays($order, $startTimestamp, $endTimestamp)
+    private function removeUncheckedParticipants($currentParticipants, $order)
     {
-        $foundDays = $this->getDaysBetweenTimestamps($startTimestamp, $endTimestamp);
+        $exParticipants = $order->getParticipants();
+        $participantsToRemove = array();
+        foreach ($exParticipants as $exParticipant)
+        {
+            if(!in_array($exParticipant, $currentParticipants))
+                array_push($participantsToRemove, $exParticipant);
+        }
+
+        foreach($participantsToRemove as $participant)
+            $order->removeParticipant($participant);
+
+        return $order;
+    }
+
+    /**
+     * @param $order Order
+     * @param $foundDays array
+     */
+    private function updateDays($order, $foundDays)
+    {
+        $this->removeOrderFromDays($order, $foundDays);
+
         if ($foundDays != null) {
             /**
              * @var $foundDay Day
              */
             foreach ($foundDays as $foundDay) {
-                $foundDay->addOrder($order);
+                if(!$foundDay->getOrders()->contains($order))
+                    $foundDay->addOrder($order);
             }
+        }
+    }
+
+    /**
+     * @param $order Order
+     * @param $foundDays array
+     */
+    private function removeOrderFromDays($order, $foundDays)
+    {
+        $startDate = $order->getStartDate();
+        $endDate = $order->getEndDate();
+
+        $previousDays = $this->dayHandler->getDaysBetweenDates($startDate, $endDate);
+        /**
+         * @var $previousDay Day
+         */
+        foreach($previousDays as $previousDay)
+        {
+            if(!in_array($previousDay, $foundDays))
+                $previousDay->removerOrder($order);
         }
     }
 
@@ -113,7 +236,7 @@ class OrderHandler
          * @var $result Day
          */
         foreach ($results as $result) {
-            $day = ['orderCount' => $result->getOrders()->count(),
+            $day = ['participantCount' => $this->getUnitsSold($result),
                 'capacity' => $result->getCapacity(),
                 'date' => $result->getDate()->getTimestamp()];
             array_push($days, $day);
@@ -133,5 +256,150 @@ class OrderHandler
         $endDate = $this->dayHandler->timestampToDate($endTimestamp);
 
         return $this->dayHandler->getDaysBetweenDates($startDate, $endDate);
+    }
+
+    /**
+     * @param $id integer
+     * @return null|Order
+     */
+    public function getOrder($id)
+    {
+        return $this->em->getRepository(Order::class)->findOneBy(array('id' => $id));
+    }
+
+    /**
+     * @param $day Day
+     * @param $participantsIds array
+     * @return int
+     */
+    private function getUnitsSold($day, $participantsIds = array())
+    {
+        $participantCount = 0;
+        $orders = $day->getOrders();
+
+        /**
+         * @var $order Order
+         */
+        foreach($orders as $order)
+        {
+            $participantsInOrder = $order->getParticipants();
+            $participantCount += $participantsInOrder->count() - $this->existingParticipantCountInOrder($participantsInOrder, $participantsIds);
+        }
+
+        return $participantCount;
+    }
+
+    /**
+     * @param $participantsInOrder
+     * @param $participantsIds
+     * @return int
+     */
+    private function existingParticipantCountInOrder($participantsInOrder, $participantsIds)
+    {
+        $participantCount = 0;
+
+        /**
+         * @var $participantInOrder Participant
+         */
+        foreach ($participantsInOrder as $participantInOrder)
+        {
+            /**
+             * @var $participantId int
+             */
+            foreach ($participantsIds as $participantId)
+            {
+                if($participantInOrder->getId() === $participantId)
+                    $participantCount++;
+            }
+        }
+
+        return $participantCount;
+    }
+
+    /**
+     * @param $date integer
+     * @return array|null
+     */
+    public function getOrdersInDay($date)
+    {
+        $result = $this->getDaysBetweenTimestamps($date, $date);
+
+        if(empty($result))
+            return null;
+
+        /**
+         * @var $result Day
+         */
+        $result = $result[0];
+        $orders = $result->getOrders();
+
+        if(empty($orders))
+            return null;
+
+        $ordersData = array();
+        /**
+         * @var $order Order
+         */
+        foreach($orders as $order)
+        {
+            /**
+             * @var $user User
+             */
+            $user = $order->getUser();
+            $data = array(
+                'userId' => $user->getId(),
+                'firstName' => $user->getFirstName(),
+                'lastName' => $user->getLastName(),
+                'id' => $order->getId(),
+                'orderedAt' => $order->getOrderedAt()->getTimestamp(),
+                'startDate' => $order->getStartDate()->getTimestamp(),
+                'endDate' => $order->getEndDate()->getTimestamp(),
+                'participantCount' => $order->getParticipants()->count()
+            );
+            array_push($ordersData, $data);
+        }
+
+        return $ordersData;
+    }
+
+    /**
+     * @param $order Order
+     * @param $user User
+     * @return array
+     */
+    public function getParticipants($order, $user)
+    {
+        $participantList = $user->getParticipants();
+        $activeParticipants = $order->getParticipants();
+
+        $participants = $this->userHandler->participantsToArray($participantList);
+        $participants = $this->findOverlapingParticipants($participants, $activeParticipants);
+
+        return $participants;
+    }
+
+    /**
+     * @param $participants
+     * @param $activeParticipants
+     * @return mixed
+     */
+    private function findOverlapingParticipants($participants, $activeParticipants)
+    {
+        for($i = 0; $i < count($participants); $i++)
+        {
+            /**
+             * @var $activeParticipant Participant
+             */
+            foreach($activeParticipants as $activeParticipant)
+            {
+                if($participants[$i]['id'] === $activeParticipant->getId())
+                {
+                    $participants[$i]['checked'] = true;
+                    break;
+                }
+            }
+        }
+
+        return $participants;
     }
 }

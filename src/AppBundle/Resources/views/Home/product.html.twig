@@ -5,8 +5,9 @@
 {% block javascripts %}
     {{ parent() }}
     <script type="text/javascript">
-        initializeUserCalendar({{serverTime}});
-        initializeParticipantManager('{{ participants|json_encode|raw }}');
+        var calendarGlobal = calendar();
+        calendarGlobal.initialize({{serverTime}}, false);
+        calendarGlobal.initializeParticipantManager('{{ participants|json_encode|raw }}');
         $("[name='appbundle_participant']").parsley();
     </script>
 {% endblock %}
@@ -17,9 +18,9 @@
         <div class="col-lg-offset-2">
             <div id="calendar" >
                 <div class="calendar_header">
-                    <div class="calendar_element calendar_arrow_container inline" onclick="nextMonth(-1)"><</div>
+                    <div class="calendar_element calendar_arrow_container inline" onclick="calendarGlobal.nextMonth(-1)"><</div>
                     <div id="calendar_headline" class="calendar_element inline">Sausis</div>
-                    <div class="calendar_element calendar_arrow_container inline" onclick="nextMonth(1)">></div>
+                    <div class="calendar_element calendar_arrow_container inline" onclick="calendarGlobal.nextMonth(1)">></div>
                     <div id="calendar_year_label"></div>
                 </div>
                 <div class="calendar_element weekday">pirmadienis</div>
@@ -58,8 +59,13 @@
     </table>
     {{ form_end(participantForm) }}
     {{ form_start(orderForm) }}
-    <div class="col-lg-1 col-lg-offset-10" style="margin-top: 30px">
-        {{ form_widget(orderForm.submit) }}
+    <div class="row" style="margin-top: 30px">
+        <div class="col-lg-10" style="text-align: right">
+            {{ form_errors(orderForm) }}
+        </div>
+        <div class="col-lg-2">
+            {{ form_widget(orderForm.submit) }}
+        </div>
     </div>
     {{ form_end(orderForm) }}
 {% endblock %}

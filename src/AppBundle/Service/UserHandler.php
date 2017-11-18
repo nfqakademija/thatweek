@@ -16,6 +16,11 @@ class UserHandler
         $this->em = $em;
     }
 
+    public function findUser($id)
+    {
+        return $this->em->getRepository(User::class)->findOneBy(array('id' => $id));
+    }
+
     public function getParticipants($id)
     {
         return $this->em->getRepository(Participant::class)->findByUserId($id);
@@ -29,7 +34,7 @@ class UserHandler
         return $user->getOrders();
     }
 
-    public function hydrateParticipants($objects)
+    public function participantsToArray($objects)
     {
         $array = array();
         /**

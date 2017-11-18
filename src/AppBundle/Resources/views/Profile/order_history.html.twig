@@ -16,9 +16,9 @@
             </tr>
             {% for order in orders %}
                 <tr>
-                    <td>{{ order.startDate | date('Y-m-d') }}</td>
-                    <td>{{ order.endDate | date('Y-m-d') }}</td>
-                    <td>{{ order.orderedAt | date('Y-m-d h:i') }}</td>
+                    <td>{{ order.startDate | date('Y-m-d', false) }}</td>
+                    <td>{{ order.endDate | date('Y-m-d', false) }}</td>
+                    <td>{{ order.orderedAt | date('Y-m-d H:i', 'Europe/Vilnius') }}</td>
                 </tr>
                 {% for participant in order.participants %}
                 <tr class="participantsRow">

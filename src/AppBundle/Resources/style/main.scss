@@ -23,14 +23,19 @@ $lightRed: #ffcccc;
   display: inline-block;
 }
 
-#appbundle_participant_submit, input,select{
+
+li{
+  color: Red;
+  list-style-type: none;
+}
+#appbundle_participant_submit, #app_calendar_submit, input,select{
   background: white;
   border: 1px gray solid;
   width: 100%;
   outline: none;
 }
 
-#appbundle_participant_submit:hover, input:hover ,select:hover{
+#appbundle_participant_submit:hover, input:hover ,select:hover, #app_calendar_submit:hover{
   border: 1px black solid !important;
   background: $lightGray;
 }
@@ -122,11 +127,10 @@ td{
   text-align: center;
 }
 
-.day_orders{
-  width: 20px;
-  display: block;
-  margin-right: 0;
-  margin-left: auto;
+.day_orders_container{
+  width: 100%;
+  padding-right: 2px;
+  text-align: right;
 }
 .calendar_element{
   border: 1px solid $lightGray;
@@ -166,20 +170,19 @@ td{
 }
 
 .day_container.day:hover{
-  background: $lightYellow;
+  background: $lightYellow !important;
 }
 
 .day_container.active{
   background: $lightGreen;
 }
 
-.day_container.active.not_assigned{
-  background: $lightRed;
+.day_container.active.not_assigned,
+.day_container.active.full{
+  background: #eededd;
 }
 
-.day_container.active.not_assigned:hover{
-  background: $lightYellow;
-}
+
 
 .day_container.edge{
   border: 2px gray solid;
@@ -207,6 +210,14 @@ td{
 .checkbox{
   display: block;
   margin:auto !important;
+}
+
+#order_list_table{
+  width: 100%;
+}
+
+.order_list_row:hover{
+  background: $lightGreen;
 }
 
 input.parsley-success,

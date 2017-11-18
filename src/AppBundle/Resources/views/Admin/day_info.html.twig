@@ -1,0 +1,15 @@
+{% extends "AppBundle:Admin:calendar.html.twig" %}
+
+{% block list %}
+    {{ parent() }}
+    <table id="order_list_table">
+        <tr>
+            <th>Vardas</th>
+            <th>Pavardė</th>
+            <th>Užsakymo data</th>
+            <th>Pradžia</th>
+            <th>Pabaiga</th>
+            <th>Dalyvių skaičius</th>
+        </tr>
+    </table>
+{% endblock %}

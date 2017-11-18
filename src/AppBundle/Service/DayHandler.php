@@ -80,7 +80,7 @@ class DayHandler
      * @param $endDate \DateTime
      * @return array
      */
-    private function createDatesBetween($startDate, $endDate)
+    public function createDatesBetween($startDate, $endDate)
     {
         $days = array();
 

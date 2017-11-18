@@ -38,6 +38,6 @@ class DayUpdateType extends AbstractType
      */
     public function getBlockPrefix()
     {
-        return 'app_calendar';
+        return 'app_day_update';
     }
 }

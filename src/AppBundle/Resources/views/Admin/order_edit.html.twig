@@ -1,0 +1,28 @@
+{% extends "AppBundle:Admin:calendar.html.twig" %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript">
+        calendarGlobal.initializeParticipantManager('{{ participants|json_encode|raw }}');
+        calendarGlobal.setIsAdmin(false);
+        calendarGlobal.setDatesFromJson('{{ dates|json_encode|raw }}');
+    </script>
+{% endblock %}
+{% block list %}
+    {{ parent() }}
+    <div class="col-lg-8">
+        <table id="participants" class="table-striped">
+            <tr><th colspan="5">Dalyviai</th></tr>
+            <tr>
+                <th width="30%">Vardas</th>
+                <th width="30%">Pavardė</th>
+                <th width="10%">Amžius</th>
+                <th width="15%">Lytis</th>
+                <th width="15%">Pasirinkti</th>
+            </tr>
+            <tr id="addParticipantRow"></tr>
+        </table>
+        {{ form_start(orderForm) }}
+        {{ form_end(orderForm) }}
+    </div>
+{% endblock %}

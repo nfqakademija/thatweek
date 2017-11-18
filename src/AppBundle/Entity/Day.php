@@ -98,7 +98,7 @@ class Day
 
 
     /**
-     * @return mixed
+     * @return ArrayCollection
      */
     public function getOrders()
     {
@@ -120,6 +120,17 @@ class Day
     public function addOrder($order)
     {
         $this->orders->add($order);
+        return $this;
+    }
+
+    /**
+     * @param $order Order
+     * @return $this Day
+     */
+    public function removerOrder($order)
+    {
+        $this->orders->removeElement($order);
+
         return $this;
     }
 }

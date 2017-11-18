@@ -11,6 +11,8 @@ use Gedmo\Mapping\Annotation as Gedmo;
  *
  * @ORM\Table(name="orders")
  * @ORM\Entity(repositoryClass="AppBundle\Repository\OrderRepository")
+ * @Gedmo\SoftDeleteable(fieldName="deletedAt", timeAware=false)
+ *
  */
 class Order
 {
@@ -49,6 +51,12 @@ class Order
      * @ORM\Column(type="datetime")
      */
     private $endDate;
+
+    /**
+     * @var \DateTime
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $deletedAt;
 
     /**
      * @ORM\ManyToMany(targetEntity="Participant")
@@ -120,13 +128,34 @@ class Order
     }
 
     /**
-     * @return mixed
+     * @param $participant Participant
+     * @return $this Order
+     */
+    public function addParticipant($participant)
+    {
+        $this->participants->add($participant);
+
+        return $this;
+    }
+
+    /**
+     * @return ArrayCollection
      */
     public function getParticipants()
     {
         return $this->participants;
     }
 
+    /**
+     * @param $participant Participant
+     * @return $this Order
+     */
+    public function removeParticipant($participant)
+    {
+        $this->participants->removeElement($participant);
+
+        return $this;
+    }
     /**
      * @return \DateTime
      */
@@ -157,6 +186,25 @@ class Order
     public function setEndDate($endDate)
     {
         $this->endDate = $endDate;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getDeletedAt()
+    {
+        return $this->deletedAt;
+    }
+
+    /**
+     * @param $deletedAt \DateTime
+     * @return Order
+     */
+    public function setDeletedAt($deletedAt)
+    {
+        $this->deletedAt = $deletedAt;
+
+        return $this;
     }
 
 

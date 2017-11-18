@@ -2,6 +2,7 @@
 
 namespace AppBundle\Form;
 
+use AppBundle\Entity\Order;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -9,6 +10,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class OrderType extends AbstractType
 {
@@ -19,23 +21,28 @@ class OrderType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('startDate', HiddenType::class)
-            ->add('endDate', HiddenType::class)
-            ->add('participants', HiddenType::class, array('allow_extra_fields' => true, 'mapped' => false))
+            ->add('startDate', HiddenType::class, array('constraints' => new NotBlank(array(
+                'message' => 'Pasirinkite dienas.')),
+                'mapped' => false))
+            ->add('endDate', HiddenType::class, array('mapped' => false))
+            ->add('participants', HiddenType::class, array(
+                'allow_extra_fields' => true,
+                'mapped' => false,
+                'constraints' => new NotBlank(array('message' => 'Pasirinkite bent vieną dalyvį.'))))
             ->add('submit', SubmitType::class, array('label' => 'Užsakyti'))
-            ->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) {
+            ->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+                /**
+                 * @var $order Order
+                 */
                 $order = $event->getData();
+                $form = $event->getForm();
 
-                $date = new \DateTime();
-                $order->setStartDate($date->setTimestamp(floor($order->getStartDate() / 1000)));
-                $date = new \DateTime();
-                $order->setEndDate($date->setTimestamp(floor($order->getEndDate() / 1000)));
-                $event->setData($order);
-        ;
-    });
-
+                if(!empty($order->getId()))
+                {
+                    $form->add('delete', SubmitType::class, array('label' => 'Ištrinti'));
+                }
+            });
     }
-
     /**
      * {@inheritdoc}
      */
@@ -51,7 +58,6 @@ class OrderType extends AbstractType
      */
     public function getBlockPrefix()
     {
-       // return 'appbundle_order';
-        return 'app_calendar';
+        return 'app_order';
     }
 }
