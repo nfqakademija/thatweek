@@ -6,7 +6,7 @@
     {{ parent() }}
     <script type="text/javascript">
         var calendarGlobal = calendar();
-        calendarGlobal.initialize({{serverTime}}, false);
+        calendarGlobal.initialize(false);
         calendarGlobal.initializeParticipantManager('{{ participants|json_encode|raw }}');
         $("[name='appbundle_participant']").parsley();
     </script>

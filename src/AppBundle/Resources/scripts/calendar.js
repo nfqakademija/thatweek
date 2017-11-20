@@ -67,7 +67,7 @@ calendar = function(time, isAdmin) {
         startingParticipantCount = manager.getCheckedCount();
     };
 
-    this.initialize = function(time, isAdmin) {
+    this.initialize = function(isAdmin) {
         admin = isAdmin;
         manager = new participantManager(this);
 
@@ -76,7 +76,7 @@ calendar = function(time, isAdmin) {
         else
             list = new orderList(this);
 
-        currentTime = timestampToDate(time);
+        initializeCurrentTime();
         serverTime = getDateClone(currentTime);
         calendarLimitStart = getDateClone(currentTime);
         calendarLimitEnd = getDateClone(currentTime);
@@ -84,6 +84,15 @@ calendar = function(time, isAdmin) {
         renderMonth();
 
     };
+
+    function initializeCurrentTime()
+    {
+        currentTime = new Date();
+        currentTime.setUTCHours(0);
+        currentTime.setUTCMinutes(0);
+        currentTime.setUTCSeconds(0);
+        currentTime.setUTCMilliseconds(0);
+    }
 
     function renderMonth() {
         var monthStartDay = getFirstDayOfMonth(currentTime);

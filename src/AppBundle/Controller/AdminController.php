@@ -36,7 +36,6 @@ class AdminController extends Controller
         $dayHandler->handle($request, $daysUpdateForm);
 
         return $this->render('AppBundle:Admin:day_info.html.twig', array(
-            'serverTime' => strtotime(date('Y-m-d')),
             'update_form' => $daysUpdateForm->createView()
         ));
     }
@@ -67,8 +66,7 @@ class AdminController extends Controller
             'participants' => $participants,
             'dates'=> $dates,
             'orderForm' => $orderEditForm->createView(),
-            'update_form' => $daysUpdateForm->createView(),
-            'serverTime' => strtotime(date('Y-m-d'))
+            'update_form' => $daysUpdateForm->createView()
         ));
     }
 }

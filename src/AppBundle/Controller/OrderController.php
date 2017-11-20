@@ -53,8 +53,7 @@ class OrderController extends Controller
         return $this->render('AppBundle:Home:product.html.twig', array(
             'participants' => $participants,
             'participantForm' => $participantForm->createView(),
-            'orderForm' => $orderForm->createView(),
-            'serverTime' => strtotime(date('Y-m-d'))
+            'orderForm' => $orderForm->createView()
         ));
     }
 
