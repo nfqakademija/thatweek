@@ -40,6 +40,7 @@ class OrderType extends AbstractType
                 if(!empty($order->getId()))
                 {
                     $form->add('delete', SubmitType::class, array('label' => 'Ištrinti'));
+                    $form->add('submit', SubmitType::class, array('label' => 'Atnaujinti'));
                 }
             });
     }

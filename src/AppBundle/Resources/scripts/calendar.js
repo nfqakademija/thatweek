@@ -38,6 +38,7 @@ calendar = function(time, isAdmin) {
     }
 
     function retrieveDaysInfo(date, data) {
+
         var key = date.getTime();
         if (!(key in daysInfo)) {
             $.ajax({
@@ -55,10 +56,9 @@ calendar = function(time, isAdmin) {
 
     function setDaysInfo(key, data) {
         daysInfo[key] = data;
-        if (admin == true)
-            updateDaysOrderLabels();
-        else
+        if (!admin)
             paintSelectedCells();
+        else updateDaysOrderLabels();
     }
 
     this.initializeParticipantManager = function(JsonData)
@@ -77,6 +77,7 @@ calendar = function(time, isAdmin) {
             list = new orderList(this);
 
         currentTime = timestampToDate(time);
+        serverTime = getDateClone(currentTime);
         calendarLimitStart = getDateClone(currentTime);
         calendarLimitEnd = getDateClone(currentTime);
         calendarLimitEnd.setMonth(calendarLimitEnd.getMonth() + calendarLimitByMonths);
@@ -105,10 +106,7 @@ calendar = function(time, isAdmin) {
         $('#calendar').append(cells);
 
         updateCalendarListeners();
-        if (orderStartDate != null)
-            paintSelectedCells();
-        if (admin == true)
-            updateDaysOrderLabels();
+        paintSelectedCells();
     }
 
     function generateEmptyCells(cellCount) {
@@ -191,6 +189,7 @@ calendar = function(time, isAdmin) {
 
      this.paintSelectedCells = function() {
         resetPaintedCells();
+        updateDaysOrderLabels();
         var date = getDateClone(currentTime);
         var key = currentTime.getTime();
         if (key in daysInfo) {
@@ -205,16 +204,22 @@ calendar = function(time, isAdmin) {
                     var isEmpty = true;
                     var isDayFull = false;
                     var day;
+
                     if (!end) {
                         day = month[counter];
                         isEmpty = !(dayNumber === getDayFromTimestamp(day['date']));
-                        if (!isEmpty) {
+
+                        if(!isEmpty)
+                            counter++;
+
+                        if(date <= serverTime)
+                            isEmpty = true;
+
+                        else if (!isEmpty) {
                             if (day['capacity'] === 0)
                                 isEmpty = true;
                             else if (isNotSelectedDayFull(day))
                                 isDayFull = true;
-                            counter++;
-
                         }
                     }
 
@@ -227,6 +232,7 @@ calendar = function(time, isAdmin) {
                             field.toggleClass('edge');
                         }
                     }
+
                     if (admin === false) {
                         if (isEmpty)
                             field.toggleClass('not_assigned');
@@ -241,14 +247,11 @@ calendar = function(time, isAdmin) {
 
     function isNotSelectedDayFull(day)
     {
-        if(getAlreadyExisting(day) === 0) {
-            if(day['capacity'] === day['participantCount'])
+        if(getAlreadyExisting(day) === 0)
+            if (day['capacity'] === day['participantCount'])
                 return true;
 
-            return day['capacity'] < day['participantCount'] + getCheckedParticipantsLength();
-        }
-
-        return day['capacity'] < day['participantCount'] + getCheckedParticipantsLength() - startingParticipantCount;
+        return day['capacity'] < day['participantCount'] + getCheckedParticipantsLength() - getAlreadyExisting(day);
     }
 
     function getAlreadyExisting(day)
@@ -310,7 +313,7 @@ calendar = function(time, isAdmin) {
         }
     };
 
-    function updateDaysOrderLabels() {
+    function updateDaysOrderLabels(){
         var key = currentTime.getTime();
         if (key in daysInfo) {
             var month = daysInfo[key];
@@ -323,7 +326,7 @@ calendar = function(time, isAdmin) {
 
                 if (matched)
                     counter++;
-                else
+                else if(admin)
                     field.html('0');
             });
         }
@@ -332,10 +335,26 @@ calendar = function(time, isAdmin) {
     function setDayOrderLabel(counter, month, field, index) {
         var day = month[counter];
         if (getDayFromTimestamp(day['date']) === index + 1) {
-            field.html(day['participantCount'] + '/' + day['capacity']);
+            if(admin)
+                field.html(day['participantCount'] + '/' + day['capacity']);
+            else if(timestampToDate(day['date']) > serverTime)
+                field.html(getUnitsLeft(day));
+
             return true;
         }
         return false
+    }
+
+    function getUnitsLeft(day)
+    {
+        var count = 0;
+        var date = timestampToDate(day['date']);
+
+        if(orderStartDate <= date && date <= orderEndDate)
+            count = day['capacity'] - day['participantCount'] - getCheckedParticipantsLength() + getAlreadyExisting(day);
+        else count = day['capacity'] - day['participantCount'];
+
+        return count < 0 ? 0 : count;
     }
 
     function getCheckedParticipantsLength() {
@@ -393,9 +412,12 @@ calendar = function(time, isAdmin) {
     }
 
     function getLastDayOfMonth(date) {
-        var y = date.getFullYear();
-        var x = date.getMonth();
-        return new Date(y, x + 1, 0);
+        var newDate = getDateClone(date);
+        var y = newDate.getFullYear();
+        var x = newDate.getMonth();
+        var lastDay = new Date(y, x + 1, 0);
+        newDate.setUTCDate(lastDay.getDate());
+        return newDate;
     }
 
     function monthDiff(first, second) {

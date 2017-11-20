@@ -10,11 +10,17 @@
         </div>
     {% if app.user %}
         <div class="navbar-header navbar-right">
-            <a class="navbar-brand" href="{{ path('profile.show') }}">{{ app.user.getFirstName }}  {{ app.user.getLastName }}</a>
+            <div class="dropdown">
+                <a class="dropdown-toggle navbar-brand" data-toggle="dropdown" href="#">{{ app.user.getFirstName }}  {{ app.user.getLastName }}
+                    <span class="caret"></span></a>
+                <ul class="dropdown-menu" style="margin-top: 40px;">
+                    <li><a href="{{ path('profile.show') }}">Profilis</a></li>
+                    <li><a href="{{ path('logout') }}">Atsijungti</a></li>
+                </ul>
+            </div>
         </div>
         <ul class="nav navbar-nav navbar-right">
         <li><a href="{{ path('order.showInfo') }}">Užsakyti</a></li>
-        <li><a href="{{ path('logout') }}">Atsijungti</a></li>
         </ul>
     {% else %}
         <ul class="nav navbar-nav navbar-right">

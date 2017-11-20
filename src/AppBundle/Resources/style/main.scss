@@ -28,14 +28,15 @@ li{
   color: Red;
   list-style-type: none;
 }
-#appbundle_participant_submit, #app_calendar_submit, input,select{
+
+input,select, button{
   background: white;
   border: 1px gray solid;
   width: 100%;
   outline: none;
 }
 
-#appbundle_participant_submit:hover, input:hover ,select:hover, #app_calendar_submit:hover{
+input:hover ,select:hover, button:hover{
   border: 1px black solid !important;
   background: $lightGray;
 }
@@ -67,6 +68,11 @@ td{
 
 .calendarBtn.disabled{
   color: $lightGray;
+}
+
+.admin_navbar{
+  height: 100vh;
+  border-right: 1px solid $lightGray;
 }
 
 #participants{
@@ -214,6 +220,14 @@ td{
 
 #order_list_table{
   width: 100%;
+}
+
+#app_order_delete{
+  background: $lightRed;
+}
+
+#app_order_delete:hover {
+  background: Red;
 }
 
 .order_list_row:hover{

@@ -30,12 +30,10 @@
                 <div class="calendar_element weekday">sekmadienis</div>
             </div>
         </div>
-        <div class="col-lg-4">
+        <div class="col-lg-2">
             {{ form_start(update_form) }}
             {{ form_end(update_form) }}
         </div>
     </div>
-    <div class="row">
-        {% block list %}{% endblock %}
-    </div>
+    {% block list %}{% endblock %}
 {% endblock %}
