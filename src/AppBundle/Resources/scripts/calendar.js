@@ -361,7 +361,7 @@ calendar = function(time, isAdmin) {
 
         if(orderStartDate <= date && date <= orderEndDate)
             count = day['capacity'] - day['participantCount'] - getCheckedParticipantsLength() + getAlreadyExisting(day);
-        else count = day['capacity'] - day['participantCount'];
+        else count = day['capacity'] - day['participantCount'] + getAlreadyExisting(day);
 
         return count < 0 ? 0 : count;
     }

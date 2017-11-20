@@ -53,7 +53,7 @@ class OrderHandler
             if($this->isSetToBeDeleted($form, $order))
                 return true;
 
-            if($this->isOrderValid($form, $foundDays))
+            if($this->isOrderValid($form, $foundDays, $order))
             {
                 $this->updateDays($order, $foundDays);
                 $order = $this->setParticipants($participantList, $order);
@@ -75,25 +75,27 @@ class OrderHandler
     /**
      * @param $form FormInterface
      * @param $foundDays array
+     * @param $order Order
      * @return bool
      */
-    private function isOrderValid($form, $foundDays)
+    private function isOrderValid($form, $foundDays, $order)
     {
         $participantList = $form['participants']->getData();
         $startDate = $this->dayHandler->timestampToDate($form['startDate']->getData());
         $endDate = $this->dayHandler->timestampToDate($form['endDate']->getData());
-        $participants = explode(',', $participantList);
-
         $actualDays = $this->dayHandler->createDatesBetween($startDate, $endDate);
+
         if(count($actualDays) !== count($foundDays))
             return false;
+
+        $participants = $this->getEntities($participantList);
 
         /**
          * @var $foundDay Day
          */
         foreach ($foundDays as $foundDay)
         {
-            $unitsSold = $this->getUnitsSold($foundDay, $participants);
+            $unitsSold = $this->getUnitsSold($foundDay) - $order->getParticipants()->count() + count($participants);
             if($foundDay->getCapacity() < $unitsSold)
                 return false;
         }
@@ -102,7 +104,7 @@ class OrderHandler
     }
 
     /**
-     * @param $participants string
+     * @param $participantList string
      * @return mixed Participants
      */
     private function getEntities($participantList)
@@ -169,6 +171,21 @@ class OrderHandler
      */
     private function removeUncheckedParticipants($currentParticipants, $order)
     {
+        $participantsToRemove = $this->getUncheckedParticipants($currentParticipants, $order);
+
+        foreach($participantsToRemove as $participant)
+            $order->removeParticipant($participant);
+
+        return $order;
+    }
+
+    /**
+     * @param $currentParticipants array
+     * @param $order Order
+     * @return array
+     */
+    private function getUncheckedParticipants($currentParticipants, $order)
+    {
         $exParticipants = $order->getParticipants();
         $participantsToRemove = array();
         foreach ($exParticipants as $exParticipant)
@@ -177,10 +194,7 @@ class OrderHandler
                 array_push($participantsToRemove, $exParticipant);
         }
 
-        foreach($participantsToRemove as $participant)
-            $order->removeParticipant($participant);
-
-        return $order;
+        return $participantsToRemove;
     }
 
     /**
@@ -236,7 +250,8 @@ class OrderHandler
          * @var $result Day
          */
         foreach ($results as $result) {
-            $day = ['participantCount' => $this->getUnitsSold($result),
+            $day = [
+                'participantCount' => $this->getUnitsSold($result),
                 'capacity' => $result->getCapacity(),
                 'date' => $result->getDate()->getTimestamp()];
             array_push($days, $day);
@@ -272,7 +287,7 @@ class OrderHandler
      * @param $participantsIds array
      * @return int
      */
-    private function getUnitsSold($day, $participantsIds = array())
+    private function getUnitsSold($day)
     {
         $participantCount = 0;
         $orders = $day->getOrders();
@@ -283,39 +298,11 @@ class OrderHandler
         foreach($orders as $order)
         {
             $participantsInOrder = $order->getParticipants();
-            $participantCount += $participantsInOrder->count() - $this->existingParticipantCountInOrder($participantsInOrder, $participantsIds);
+            $participantCount += $participantsInOrder->count();
         }
-
         return $participantCount;
     }
-
-    /**
-     * @param $participantsInOrder
-     * @param $participantsIds
-     * @return int
-     */
-    private function existingParticipantCountInOrder($participantsInOrder, $participantsIds)
-    {
-        $participantCount = 0;
-
-        /**
-         * @var $participantInOrder Participant
-         */
-        foreach ($participantsInOrder as $participantInOrder)
-        {
-            /**
-             * @var $participantId int
-             */
-            foreach ($participantsIds as $participantId)
-            {
-                if($participantInOrder->getId() === $participantId)
-                    $participantCount++;
-            }
-        }
-
-        return $participantCount;
-    }
-
+    
     /**
      * @param $date integer
      * @return array|null
