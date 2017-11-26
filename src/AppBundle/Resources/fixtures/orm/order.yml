@@ -1,0 +1,7 @@
+AppBundle\Entity\Order:
+    order{1..250}:
+        user: '@user*'
+        orderedAt: '<dateTimeBetween(@user*->createdAt, "now")>'
+        startDate: '<dateTimeBetween($orderedAt, "now +2 months")>'
+        endDate: '<dateTimeBetween($startDate, "now +5 months")>'
+        participants: '1x @participant*'

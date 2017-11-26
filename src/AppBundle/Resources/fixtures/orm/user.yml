@@ -1,0 +1,14 @@
+AppBundle\Entity\User:
+    user_admin:
+        apiId:  1744811682218490
+        firstName: Martynas
+        lastName: Treinys
+        roles: ['ROLE_USER', 'ROLE_ADMIN']
+        createdAt: '<dateTimeBetween("-1 year", "now")>'
+    user{1..100}:
+        apiId (unique): '<numberBetween( 1000000000000000,  9000000000000000)>'
+        firstName: '<firstName()>'
+        lastName: '<lastName()>'
+        picture (unique): '<image()>'
+        roles: 'ROLE_USER'
+        createdAt: '<dateTimeBetween("-1 year", "now")>'

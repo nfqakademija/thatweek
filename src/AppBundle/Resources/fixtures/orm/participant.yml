@@ -1,0 +1,7 @@
+AppBundle\Entity\Participant:
+    participant{1..200}:
+        gender: '<randomElement(["m", "f"])>'
+        firstName: '<firstName()>'
+        lastName: '<lastName()>'
+        age: '<numberBetween(4, 16)>'
+        user: '@user*'
